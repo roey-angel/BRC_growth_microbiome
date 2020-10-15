@@ -1,0 +1,26 @@
+Sample.code,Rock.type,Location,Replicate,Sample.name
+ShivSClk1S12,Chalk,City,2,City Chalk 2
+ShivSClk2S15,Chalk,City,3,City Chalk 3
+ShivSClk3S16,Chalk,City,4,City Chalk 4
+ShivSClk4S17,Chalk,City,5,City Chalk 5
+ShivSClk5S18,Chalk,City,6,City Chalk 6
+SlpClk9S11,Chalk,City,1,City Chalk 1
+ShivSLimek1S13,Limestone,City,1,City Limestone 1
+ShivSLimek2S14,Limestone,City,2,City Limestone 2
+ShivSLimek3S19,Limestone,City,3,City Limestone 3
+ShivSLimek4S20,Limestone,City,4,City Limestone 4
+ShivSLimek5S21,Limestone,City,5,City Limestone 5
+ShivSLimek6S25,Limestone,City,6,City Limestone 6
+SlpClk2S4,Chalk,Slope,1,Slope Chalk 1
+SlpClk3S5,Chalk,Slope,2,Slope Chalk 2
+SlpClk4S6,Chalk,Slope,3,Slope Chalk 3
+SlpClk5S7,Chalk,Slope,4,Slope Chalk 4
+SlpClk6S8,Chalk,Slope,5,Slope Chalk 5
+SlpClk7S9,Chalk,Slope,6,Slope Chalk 6
+SlpClk8S10,Chalk,Slope,7,Slope Chalk 7
+SlpClk1S3,Limestone,Slope,1,Slope Limestone 1
+SlpLime1S1,Limestone,Slope,2,Slope Limestone 2
+SlpLime2S2,Limestone,Slope,3,Slope Limestone 3
+SlpLime3S22,Limestone,Slope,4,Slope Limestone 4
+SlpLime4S23,Limestone,Slope,5,Slope Limestone 5
+SlpLime5S24,Limestone,Slope,6,Slope Limestone 6

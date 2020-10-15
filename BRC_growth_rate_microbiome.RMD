@@ -1,0 +1,2426 @@
+---
+title: "How fast does biological rock crust grow?"
+subtitle: "Microbial community analysis"
+
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+bibliography: references.bib
+link-citations: yes
+csl: fems-microbiology-ecology.csl
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    keep_md: false
+    number_sections: false
+    highlight: "pygments"
+    theme: "flatly"
+    df_print: "kable"
+    fig_caption: true
+    code_folding: "show"
+---
+
+```{r libraries, include=F}
+library(extrafont) # Tools for using fonts, CRAN v0.17
+library(svglite) # An 'SVG' Graphics Device, CRAN v1.2.3.2
+library(ragg) # Graphic Devices Based on AGG, CRAN v0.3.1
+library(tidyverse) # Easily Install and Load the 'Tidyverse', CRAN v1.3.0 
+library(magrittr) # A Forward-Pipe Operator for R, CRAN v1.5
+library(scales) # Scale Functions for Visualization, CRAN v1.1.1
+library(ggpomological) # Pomological plot themes for ggplot2, [github::gadenbuie/ggpomological] v0.1.2 
+library(cowplot) # Streamlined Plot Theme and Plot Annotations for 'ggplot2', CRAN v1.1.0
+library(patchwork) # The Composer of Plots, CRAN v1.0.1 # The Composer of Plots, CRAN v1.0.1
+library(kableExtra) # Construct Complex Table with 'kable' and Pipe Syntax, CRAN v1.2.1
+library(see) # Visualisation Toolbox for 'easystats' and Extra Geoms, Themes and Color Palettes for 'ggplot2', CRAN v0.6.0
+library(phyloseq) # Handling and analysis of high-throughput microbiome census data, Bioconductor v1.32.0
+library(speedyseq) # psmelt
+library(vegan) # Community Ecology Package, CRAN v2.5-6
+library(BiodiversityR) # Package for Community Ecology and Suitability Analysis, CRAN v2.12-1
+# library(agricolae)
+library(car) # Companion to Applied Regression, CRAN v3.0-9
+library(userfriendlyscience) # Quantitative Analysis Made Accessible, CRAN v0.7.2
+library(emmeans) # Estimated Marginal Means, aka Least-Squares Means, CRAN v1.5.1
+library(multcomp) # Simultaneous Inference in General Parametric Models, CRAN v1.4-14
+library(ALDEx2) # Analysis Of Differential Abundance Taking Sample Variation Into Account, Bioconductor v1.20.0
+library(corncob) # Count Regression for Correlated Observations with the Beta-Binomial, [github::bryandmartin/corncob] v0.1.0
+library(ggrepel) # Automatically Position Non-Overlapping Text Labels with 'ggplot2', CRAN v0.8.2 
+```
+
+```{r style settings, include=F}
+options(width = 90, knitr.table.format = "html") 
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  cache = TRUE,
+  dev = c("svglite", "png"),
+  dev.args = list(svglite = list(bg = 'white'), png = list(bg = 'white')),
+  dpi = 300,
+#  fig.width = 12,
+#  fig.height = 8,
+  cache.path = "Shivta_cache/",
+  fig.path = "Shivta_figures/"
+)
+f_name <- "DejaVu Sans" #sub("\\s//", "", f_name)
+f_size <- 12
+font_import(pattern = "DejaVuSans", prompt = FALSE)
+loadfonts() # registers fonts
+theme_set(theme_bw(base_size = f_size, 
+                      base_family = f_name
+                      ))
+```
+
+```{r functions, include=FALSE}
+PlotLibDist <- function(Ps_obj, x = "Replicate", fill = "Rock.type", facet = "Location") {
+  Library.size <- rowSums(otu_table(Ps_obj))
+  ggplot(sample_data(Ps_obj),
+         aes(x = !!sym(x), y = Library.size, fill = !!sym(fill))) +
+    geom_bar(stat = "identity",
+             position = "dodge",
+             color = "black") +
+    scale_y_log10(
+      breaks = trans_breaks("log10", function(x)
+        10 ^ x),
+      labels = trans_format("log10", math_format(10 ^ .x))
+    ) +
+    background_grid(major = "xy", minor = "none") +
+    scale_fill_pomological() +
+    facet_grid(get(facet) ~ .)
+}
+
+PlotReadHist <- function(OTUmat, b.width = 10) {
+  OTUmat %>%
+    t() %>%
+    as.tibble() %>%
+    gather(key = sample, value = abundance) %>%
+    ggplot(aes(abundance)) +
+    # geom_histogram(binwidth = 1000) +
+    geom_freqpoly(binwidth = b.width) +
+    scale_y_log10()
+}
+
+GMPR <- function (comm,
+                  intersect.no = 4,
+                  ct.min = 4) {
+  require(matrixStats)
+  # Computes the GMPR size factor
+  #
+  # Args:
+  #   comm: a matrix of counts, row - features (OTUs, genes, etc) , column - sample
+  #   intersect.no: the minimum number of shared features between sample pair, where the ratio is calculated
+  #   ct.min: the minimum number of counts required to calculate ratios （Empirical study found ct.min=4 is suitable)
+  
+  #
+  # Returns:
+  #   a list that contains:
+  #      gmpr： the GMPR size factors for all samples; Samples with distinct sets of features will be output as NA.
+  #      nss:   number of samples with significant sharing (> intersect.no) including itself
+  
+  # mask counts < ct.min
+  comm[comm < ct.min] <- 0
+  
+  if (is.null(colnames(comm))) {
+    colnames(comm) <- paste0('S', 1:ncol(comm))
+  }
+  
+  cat('Begin GMPR size factor calculation ...\n')
+  
+  comm.no <- numeric(ncol(comm))
+  gmpr <- sapply(1:ncol(comm),  function(i) {
+    if (i %% 50 == 0) {
+      cat(i, '\n')
+    }
+    x <- comm[, i]
+    # Compute the pairwise ratio
+    pr <- x / comm
+    # Handling of the NA, NaN, Inf
+    pr[is.nan(pr) | !is.finite(pr) | pr == 0] <- NA
+    # Counting the number of non-NA, NaN, Inf
+    incl.no <- colSums(!is.na(pr))
+    # Calculate the median of PR
+    pr.median <- colMedians(pr, na.rm = TRUE)
+    # Record the number of samples used for calculating the GMPR
+    comm.no[i] <<- sum(incl.no >= intersect.no)
+    # Geometric mean of PR median
+    if (comm.no[i] > 1) {
+      return(exp(mean(log(pr.median[incl.no >= intersect.no]))))
+    } else {
+      return(NA)
+    }
+  })
+  
+  if (sum(is.na(gmpr))) {
+    warning(
+      paste0(
+        'The following samples\n ',
+        paste(colnames(comm)[is.na(gmpr)], collapse = '\n'),
+        '\ndo not share at least ',
+        intersect.no,
+        ' common taxa with the rest samples! ',
+        'For these samples, their size factors are set to be NA! \n',
+        'You may consider removing these samples since they are potentially outliers or negative controls!\n',
+        'You may also consider decreasing the minimum number of intersecting taxa and rerun the procedure!\n'
+      )
+    )
+  }
+  
+  cat('Completed!\n')
+  cat(
+    'Please watch for the samples with limited sharing with other samples based on NSS! They may be outliers! \n'
+  )
+  names(gmpr) <- names(comm.no) <- colnames(comm)
+  return(list(gmpr = gmpr, nss = comm.no))
+}
+
+PlotLmResid <- function(lm.df, which = c(1:6), mfrow = c(3, 2)){
+  require(grid)
+  if (length(levels(as.factor(lm.df$.fitted))) < 10) {# if number of unique x values is <10 just draw a line through the means
+    smoother <- stat_summary(fun = mean, colour = "red", geom = "line")
+  } else smoother <- stat_smooth(method = "loess", geom = "smooth", se = FALSE, colour = "firebrick", size = 1)
+  
+  # residuals vs fitted
+  g1 <- ggplot(lm.df, aes(.fitted, .resid)) +
+    geom_point()  +
+    smoother + 
+    geom_hline(yintercept = 0, linetype = 2, size = .2) +
+    scale_x_continuous("Fitted Values") +
+    scale_y_continuous("Residual") +
+    labs(title = "Residuals vs Fitted")
+  
+  # normal qq
+  a <- quantile(lm.df$.stdresid, c(0.25, 0.75), na.rm = TRUE)
+  b <- qnorm(c(0.25, 0.75))
+  slope <- diff(a)/diff(b)
+  int <- a[1] - slope * b[1]
+  g2 <- ggplot(lm.df, aes(sample = .stdresid)) +
+    stat_qq() +
+    geom_abline(slope = slope, intercept = int, colour = "firebrick", size = 1) +
+      scale_x_continuous("Theoretical Quantiles") +
+      scale_y_continuous("Standardized Quantiles") +
+      labs(title = "Normal Q-Q")
+ 
+  # scale-location
+  g3 <- ggplot(lm.df, aes(.fitted, sqrt(abs(.stdresid)))) +
+    geom_point() +
+    smoother +
+    scale_x_continuous("Fitted Values") +
+    scale_y_continuous("Root of Standardized Residuals") +
+    labs(title = "Scale-Location")
+ 
+  # residuals vs leverage
+  g4 <- ggplot(lm.df, aes(factors, .stdresid)) +
+    geom_point() +
+    smoother +
+    geom_hline(yintercept = 0, linetype = 2, size = .2) +
+    scale_x_continuous("Factor Level Combinations") +
+    scale_y_continuous("Standardized Residuals") +
+    labs(title = "Residuals vs Factor Levels")
+ 
+#   # cook's distance
+#   g5 <-  ggplot(lm.df, aes(rows, .cooksd, ymin=0, ymax=.cooksd)) +
+#     geom_point() + geom_linerange() +
+#     scale_x_continuous("Observation Number") +
+#     scale_y_continuous("Cook's distance") +
+#     labs(title="Cook's Distance")  
+  
+  # cooksd vs leverage
+  g5 <- ggplot(lm.df, aes(factors, .cooksd)) +
+    geom_point() +
+    smoother +
+    scale_x_continuous("Factor Level Combinations") +
+    scale_y_continuous("Cook's distance") +
+    labs(title = "Cook's dist vs Leverage")
+  
+  bw <- diff(range(lm.df$.resid)) / (2 * IQR(lm.df$.resid) / length(lm.df$.resid) ^ (1/3))
+  sshist <- function(x){ # optimise bins
+  # 2006 Author Hideaki Shimazaki
+  # Department of Physics, Kyoto University
+  # shimazaki at ton.scphys.kyoto-u.ac.jp
+	N <- 2 : 100
+	C <- numeric(length(N))
+	D <- C
+	for (i in 1:length(N)) {
+		D[i] <- diff(range(x)) / N[i]
+		edges = seq(min(x), max(x), length=N[i])
+		hp <- hist(x, breaks = edges, plot=FALSE)
+		ki <- hp$counts
+		k <- mean(ki)
+		v <- sum((ki-k) ^ 2) / N[i]
+		C[i] <- (2 * k-v) / D[i] ^ 2	#Cost Function
+	}
+	idx <- which.min(C)
+	optD <- D[idx]
+	bins <- seq(min(x), max(x), length=N[idx])
+	# h = hist(x, breaks = bins)
+	# rug(x)
+	return(bins)
+  }
+  
+  bins <- sshist(lm.df$.resid)
+  g6 <- ggplot(lm.df, aes(.resid)) + 
+    geom_histogram(breaks = bins)
+ 
+  plots <- list(g1, g2, g3, g4, g5, g6)
+ 
+  # making the plots
+  grid.newpage()
+ 
+  if (prod(mfrow) > 1) {
+    mypos <- expand.grid(1:mfrow[1], 1:mfrow[2])
+    mypos <- mypos[with(mypos, order(Var1)), ]
+    pushViewport(viewport(layout = grid.layout(mfrow[1], mfrow[2])))
+    formatter <- function(.){}
+  } else {
+    mypos <- data.frame(matrix(1, length(which), 2))
+    pushViewport(viewport(layout = grid.layout(1, 1)))
+    formatter <- function(.) {
+      .dontcare <- readline("Hit <Return> to see next plot: ")
+      grid.newpage()
+    }
+  }
+ 
+  j <- 1
+  for (i in which) {
+    formatter()
+    print(plots[[i]], vp = viewport(layout.pos.row = mypos[j, ][1], layout.pos.col = mypos[j, ][2]))
+    j <- j + 1
+  }
+}
+
+TestAlphaV3 <- function(data2test = Richness_Diversity_long_sub,
+                        response_name = "Estimate",
+                        factor_names = c("Location", "Rock.type"),
+                        boxcox.trans = FALSE) {
+  # replaced SRH test with ranked ANOVA if Leven's is significant
+  # art only works on balanced designs!!
+  # TODO: plot resid for mod_art
+  
+    require(dplyr)
+      mod_lm <-
+        aov(as.formula(paste(
+          response_name,
+          paste(factor_names[1], factor_names[2], sep = " * "),
+          sep = " ~ "
+        )), data2test)
+    # }
+    
+    if (boxcox.trans) {
+      # employ boxcox transformation then recalculate model
+      print("Performing Box-Cox transformation of the data")
+      lambdas <- boxcox(as.formula(paste(
+        response_name,
+        paste(factor_names[1], factor_names[2], sep = " * "),
+        sep = " ~ "
+      )),
+      data = data2test,
+      lambda = seq(0, 1.0, 0.01))
+      print(range(lambdas$x[lambdas$y > max(lambdas$y) - qchisq(0.95, 1) /
+                              2]))
+      print(l.max <- lambdas$x[which.max(lambdas$y)])
+      if (l.max == 0)
+        l.max <- 1
+      data2test$Estimate.box <-
+        (data2test$Estimate ^ l.max - 1) / l.max
+      mod_lm <-
+        aov(as.formula(paste(
+          "Estimate.box",
+          paste(factor_names[1], factor_names[2], sep = " * "),
+          sep = " ~ "
+        )), data2test)
+    }
+    
+    if (exists("mod_lm")) {
+      print(mod_lm)
+      mod_df <- fortify(mod_lm)
+      factor.combinations <-
+        as.numeric(factor(paste(mod_df[, factor_names[1]], mod_df[, factor_names[2]]),
+                          levels = unique(as.character(
+                            paste(mod_df[, factor_names[1]], mod_df[, factor_names[2]])
+                          )))) # needed for "residuals vs leverage
+      mod_df <-
+        cbind(mod_df,
+              rows = 1:nrow(mod_df),
+              factors = factor.combinations)
+      PlotLmResid(mod_df)
+      if ((data2test %>% group_by(!!sym(factor_names[1]),!! sym(factor_names[2])) %>% dplyr::count() %>% pull(n) %>% n_distinct() == 1)) {
+        print("Equal group sizes - showing SS type I")
+        print(summary(mod_lm)) # display Type I ANOVA table
+        } else {
+          print("Unequal group sizes - showing SS type III")
+          options(contrasts = c("contr.sum", "contr.poly"))
+          print(Anova(mod_lm, type = "III")) # type III SS
+          }
+      print(model.tables(mod_lm, "means"), digits = 3) # Show the means
+      return(mod_lm)
+    }
+  }
+
+PairwiseAdonis <- function(x, factors, sim.function = "vegdist", sim.method = "horn", 
+    p.adjust.m = "BH", reduce = NULL) 
+{
+  # Taken from: https://github.com/pmartinezarbizu/pairwiseAdonis
+  
+    co <- combn(unique(as.character(factors)), 2)
+    pairs <- c()
+    total.DF <- c()
+    F.Model <- c()
+    R2 <- c()
+    p.value <- c()
+    for (elem in 1:ncol(co)) {
+        if (sim.function == "daisy") {
+            x1 = cluster::daisy(x[factors %in% c(co[1, elem], co[2, elem]), 
+                ], metric = sim.method)
+        }
+        else {
+            x1 = vegdist(x[factors %in% c(co[1, elem], co[2, 
+                elem]), ], method = sim.method)
+        }
+        ad <- adonis(x1 ~ factors[factors %in% c(co[1, elem], 
+            co[2, elem])], permutations = 999)
+        pairs <- c(pairs, paste(co[1, elem], "-", co[2, elem]))
+        total.DF <- c(total.DF, ad$aov.tab["Total", 1])
+        F.Model <- c(F.Model, ad$aov.tab[1, 4])
+        R2 <- c(R2, ad$aov.tab[1, 5])
+        p.value <- c(p.value, ad$aov.tab[1, 6])
+    }
+    p.adjusted <- p.adjust(p.value, method = p.adjust.m)
+    sig = c(rep("", length(p.adjusted)))
+    sig[p.adjusted <= 0.05] <- "."
+    sig[p.adjusted <= 0.01] <- "*"
+    sig[p.adjusted <= 0.001] <- "**"
+    sig[p.adjusted <= 1e-04] <- "***"
+    pairw.res <- data.frame(pairs, total.DF, F.Model, R2, p.value, 
+        p.adjusted, sig)
+    if (!is.null(reduce)) {
+        pairw.res <- subset(pairw.res, grepl(reduce, pairs))
+        pairw.res$p.adjusted <- p.adjust(pairw.res$p.value, method = p.adjust.m)
+        sig = c(rep("", length(pairw.res$p.adjusted)))
+        sig[pairw.res$p.adjusted <= 0.05] <- "."
+        sig[pairw.res$p.adjusted <= 0.01] <- "*"
+        sig[pairw.res$p.adjusted <= 0.001] <- "**"
+        sig[pairw.res$p.adjusted <= 1e-04] <- "***"
+        pairw.res <- data.frame(pairw.res[, 1:5], sig)
+    }
+    class(pairw.res) <- c("pwadonis", "data.frame")
+    return(pairw.res)
+}
+
+STAMPR2 <- function(physeq_obj,
+                    tax_rank = "Phylum",
+                    vars2test = c("Vegetation", "Elevation..m."),
+                    threshold = 0.005,
+                    outputfile = "STAMPR_output") {
+    # run a STAMP-like analysis: compare relative abundance differences using two-way analysis, then run a post-hoc test and correct for multiple comparison. This is an extended and updated version for Parks, D. H., Tyson, G. W., Hugenholtz, P., and Beiko, R. G. (2014). STAMP: statistical analysis of taxonomic and functional profiles. Bioinformatics 30, 3123–3124. doi:10.1093/bioinformatics/btu494.)
+    # The test is meant as a follow-up test for a pair-wise ADONIS and use the significant test pairs
+    # The global analysis is done using the Aligned Rank Transformed ANOVA test. This is a "modern" non-parametric test that should be more robust than the Kruskal-Wallis Rank Sum Test or the Scheirer Ray Hare.
+    # The post-hoc test is an Estimated marginal means test on each significant pair.
+    # If two variables are provided only the interactions are computed (for the main effects run it separately on each variable)
+    # TODO: 
+    require("emmeans") # Estimated marginal means (Least-squares means))
+    require("ARTool") # Aligned Rank Transform
+    require("multcomp") # Simultaneous Inference in General Parametric Models 
+    if (length(vars2test) != 1 &
+        length(vars2test) != 2)
+    {stop('This function only suppurts 1 or two independent variables')}
+    
+    test_expression <-
+      as.formula(paste("Abundance", paste(vars2test, collapse = " * "), sep = " ~ "))
+    
+    physeq_rel <-
+      transform_sample_counts(physeq_obj, function(x)
+        x / sum(x)) # convert to relative abundance
+    
+    physeq_glom_rel <- tax_glom(physeq_rel,
+                            tax_rank,
+                            NArm = TRUE) # agglomerate taxa using taxonomy
+
+    
+    # Test only abundant taxa: group dataframe by rank, calculate median rel. abundance and keep only taxa above threshold
+    physeq_glom_rel %>%
+      psmelt(.) %>%
+      group_by(!!sym(tax_rank)) %>%
+      summarise(median = median(Abundance)) %>%
+      filter(median >= threshold) %>%
+      pull(1) %>%
+      as.character() ->
+      Taxa2test
+    
+    physeq_glom_rel_abund <- # remove rare taxa
+      prune_taxa(tax_table(physeq_glom_rel)[, tax_rank] %in% Taxa2test, physeq_glom_rel)
+    
+    if (length(vars2test) == 1) {# One-way test
+       cmb <- combn(unique(as.character(get_variable(physeq_glom_rel_abund, vars2test))), 2)
+      as_tibble(matrix( # prepare results table (P and Eta)
+        NA,
+        nrow = ntaxa(physeq_glom_rel_abund),
+        ncol = ncol(cmb) + 2,
+      ), .name_repair = "minimal") %>% 
+        bind_cols(Phylum = as(tax_table(physeq_glom_rel_abund)[, tax_rank], "vector"), .) %>% 
+        set_names(c(tax_rank,
+                    paste(vars2test, "- P"),
+                    paste(vars2test, "- EtaSq"),
+                    seq(ncol(cmb)))) %>% 
+        mutate_if(., is.logical, as.numeric) ->
+        taxa_test_results
+      
+      as_tibble(matrix( # prepare estimates table
+        NA,
+        nrow = ntaxa(physeq_glom_rel_abund),
+        ncol = (ncol(cmb) * 5)
+      ),
+      .name_repair = "minimal") %>% 
+        bind_cols(Phylum = as(tax_table(physeq_glom_rel_abund)[, tax_rank], "vector"), .) %>% 
+        mutate_if(., is.logical, as.numeric) ->
+        taxa_test_estimates 
+      
+      colnames(taxa_test_estimates) <- # cannot use set_names with non-unique names
+        c(tax_rank, c(rbind(
+          cmb, matrix(rep(
+            c("Estimate diff.", "low CI", "high CI"), ncol(cmb)
+          ), ncol = ncol(cmb))
+        ))) # this is ugly but it works well, basically c() flattens a matrix
+      
+      for (phy_id in seq(ntaxa(physeq_glom_rel_abund))) {
+        data2test <-
+          bind_cols(Abundance = as.numeric(otu_table(physeq_glom_rel_abund)[, phy_id] * 100),
+                    as(sample_data(physeq_glom_rel_abund), "data.frame"))
+        print(tax_table(physeq_glom_rel_abund)[phy_id, tax_rank])
+        
+        art_mod <- art(test_expression, data = data2test)
+        print(mod_summary <- anova(art_mod))
+        taxa_test_results[phy_id, c(2)] <- mod_summary$`Pr(>F)` # p values
+        mod_summary %>% 
+          transmute(`Part Eta Sq` = `Sum Sq`/(`Sum Sq` + `Sum Sq.res`)) ->
+          taxa_test_results[phy_id, c(3)] # EtaSq (effect size)
+        art_mod_lm <- artlm(art_mod, vars2test) # build a linear model for ART data
+        # Compute estimated marginal means (EMMs)
+        (emm_mod <- emmeans(art_mod_lm, as.formula(paste("", vars2test, sep = " ~ ")), weights = "equal"))
+        
+        # Contrasts, pairwise comparisons, tests, and confidence intervals.
+        (emm_mod_cons <- contrast(emm_mod, method = "pairwise", adjust = "tukey"))  
+        # (emm_mod_CI <- confint(emm_mod_cons, adjust = "fdr", level = 0.95, type = "response")) 
+        # (emm_mod_CLD <- multcomp::cld(emm_mod, alpha = 0.05, Letters = letters, adjust = "tukey")) 
+        print("Note that the estimates aren’t as in a linear model because they are on the scale of ranks and not the data, but the p-values are useful")
+        
+        # assign pairwise results to table
+        colnames(taxa_test_results)[seq(4, 3 + ncol(cmb))] <- summary(emm_mod_cons)$contrast
+        taxa_test_results[phy_id, seq(4, 3 + ncol(cmb))] <-
+          as.list(summary(emm_mod_cons)$p.value)
+        # assign estimates to table
+        mod_lm <- lm(test_expression, data = data2test) # because we want the real means not the rank means!
+        emm_mod_lm <- emmeans(mod_lm, as.formula(paste("", vars2test, sep = " ~ ")), weights = "equal")
+        emm_mod_lm_cons <- contrast(emm_mod, method = "pairwise", adjust = "tukey") 
+        emm_mod_lm_CI <- confint(emm_mod_lm_cons, adjust = "fdr", level = 0.95, type = "response")
+        taxa_test_estimates[phy_id, c(2,3)] <- as.list(summary(emm_mod_lm)$emmean)
+        taxa_test_estimates[phy_id, 4] <- emm_mod_lm_CI$estimate
+        taxa_test_estimates[phy_id, 5] <- as.list(emm_mod_lm_CI$lower.CL)
+        taxa_test_estimates[phy_id, 6] <- as.list(emm_mod_lm_CI$upper.CL)
+        # # assign pairwise means and CI to table
+        # # I use wilcox.test here to get estimates on the moments and CI of the data not the ranks and p-value
+        # for (pair in seq(length(sig_pairs[[1]]))) {
+        #   pair2test <- unlist(str_split(sig_pairs[[1]][pair], " - "))
+        #   possibleError <- tryCatch(
+        #     wilcox_mod <- wilcox.test(
+        #         test_expression,
+        #         data = data2test,
+        #         subset = do.call("%in%", list(get(vars2test), pair2test)), # grab only pair2test from vars2test
+        #         conf.int = TRUE,
+        #         exact = FALSE
+        #       ),
+        #     error = function(e)
+        #       e
+        #   ) # AKA Mann Whitney
+        #   if (inherits(possibleError, 'error')) {
+        #     print(possibleError)
+        #     taxa_test_results[phy_id, pair + 3] <- NA
+        #   } else {
+        #     print(wilcox_mod)
+        #     taxa_test_estimates[phy_id, (pair - 1) * 5 + 2] <-
+        #       mean(data2test[unlist(data2test[vars2test]) %in% pair2test[1],]$Abundance)
+        #     taxa_test_estimates[phy_id, (pair - 1) * 5 + 3] <-
+        #       mean(data2test[unlist(data2test[vars2test]) %in% pair2test[2],]$Abundance)
+        #     taxa_test_estimates[phy_id, (pair - 1) * 5 + 4] <-
+        #       wilcox_mod$estimate
+        #     taxa_test_estimates[phy_id, (pair - 1) * 5 + c(5, 6)] <-
+        #       as.list(wilcox_mod$conf.int[c(1, 2)])
+        #   }
+        # }
+      }
+    } else {# Two-way test
+      cmb <- combn(unique(c(as.character(get_variable(physeq_glom_rel_abund, vars2test[1])), as.character(get_variable(physeq_glom_rel_abund, vars2test[2])))), 2) # just for setting the right number of columns
+      
+      sample_data(physeq_glom_rel_abund)$Vars_combination <-  with(sample_data(physeq_glom_rel_abund), get(vars2test[1]):get(vars2test[2]))
+      as_tibble(matrix( 
+        NA,
+        nrow = ntaxa(physeq_glom_rel_abund),
+        ncol = sum(ncol(cmb)) + 6, # sig_pairs is taken from pairwise adonis. In addition the factors are tested alone.
+      ),
+      .name_repair = "minimal") %>% 
+        bind_cols(Phylum = as(tax_table(physeq_glom_rel_abund)[, tax_rank], "vector"), .) %>% 
+        set_names(c(tax_rank,
+                    paste(vars2test[1], "- P"),
+                    paste(vars2test[1], "- EtaSq"),
+                    paste(vars2test[2], "- P"),
+                    paste(vars2test[2], "- EtaSq"),
+                    paste(paste(vars2test, collapse = " X "), "- P"),
+                    paste(paste(vars2test, collapse = " X "), "- EtaSq"),
+                    seq(ncol(cmb)))) %>% 
+        mutate_if(., is.logical, as.numeric) ->
+        taxa_test_results # prepare results table (P and Eta)
+      
+      as_tibble(matrix(
+        NA,
+        nrow = ntaxa(physeq_glom_rel_abund),
+        ncol = (ncol(cmb) * 5) 
+      ),
+      .name_repair = "minimal") %>% 
+        bind_cols(Phylum = as(tax_table(physeq_glom_rel_abund)[, tax_rank], "vector"), .) %>% 
+        mutate_if(., is.logical, as.numeric) ->
+        taxa_test_estimates # prepare estimates table
+      
+      colnames(taxa_test_estimates) <- # cannot use set_names with non-unique names
+        c(tax_rank, c(rbind(
+          cmb, matrix(rep(
+            c("Estimate diff.", "low CI", "high CI"), ncol(cmb)
+          ), ncol = ncol(cmb))
+        ))) # this is ugly but it works well, basically c() flattens a matrix
+      
+      for (phy_id in seq(ntaxa(physeq_glom_rel_abund))) {
+        bind_cols(Abundance = as.numeric(otu_table(physeq_glom_rel_abund)[, phy_id] * 100), as(sample_data(physeq_glom_rel_abund), "data.frame")) %>% 
+          mutate_at(., vars2test[1],as.factor) %>% 
+          mutate_at(., vars2test[2],as.factor) %>% 
+          mutate_at(., "Vars_combination", as.factor) ->
+          data2test
+        
+        print(tax_table(physeq_glom_rel_abund)[phy_id, tax_rank])
+        
+        art_mod <- art(test_expression, data = data2test)
+        print(mod_summary <- anova(art_mod))
+        taxa_test_results[phy_id, c(2, 4, 6)] <-
+          as.list(mod_summary$`Pr(>F)`) # p values
+        mod_summary %>% 
+          transmute(`Part Eta Sq` = `Sum Sq`/(`Sum Sq` + `Sum Sq.res`)) %>% 
+          t() %>% 
+          as.list() ->
+          taxa_test_results[phy_id, c(3, 5, 7)]  # EtaSq (effect size)
+        
+        # Post hoc of the main effects
+        posthoc_expression <- as.formula(paste("Abundance", "Vars_combination", sep = " ~ "))
+        art_mod_lm <- artlm(art(posthoc_expression, data = data2test), "Vars_combination") # build a linear model for ART data (This only works on combined factors; see: https://cran.r-project.org/web/packages/ARTool/vignettes/art-contrasts.html). Also, this might not be generalisable for more factors than two!!
+        # Compute estimated marginal means (EMMs)
+        (emm_mod <- emmeans(art_mod_lm, as.formula(paste("~", "Vars_combination"))))       
+        # Contrasts, pairwise comparisons, tests, and confidence intervals.
+        (emm_mod_cons <- contrast(emm_mod, method = "pairwise", adjust = "tukey")) 
+        # (emm_mod_CI <- confint(emm_mod_cons, adjust = "tukey", level = 0.95, type = "response")) 
+        # (emm_mod_CLD <- cld(emm_mod, alpha = 0.05, Letters = letters, adjust = "tukey")) 
+        print("Note that the estimates aren’t as in a linear model because they are on the scale of ranks and not the data, but the p-values are useful")
+        
+        # assign pairwise results to table
+        colnames(taxa_test_results)[seq(8, 7 + ncol(cmb))] <- summary(emm_mod_cons)$contrast
+        taxa_test_results[phy_id, seq(8, 7 + length(summary(emm_mod_cons)$p.value))] <-
+          as.list(summary(emm_mod_cons)$p.value) # need to check!! (trouble is it outputs everything and not just significant ones)
+        
+        # assign estimates to table
+        mod_lm <- lm(test_expression, data = data2test) # because we want the real means not the rank means!
+        emm_mod_lm <- emmeans(mod_lm, as.formula(paste("~", vars2test[1], "*",vars2test[2])), weights = "equal")
+        # emm_mod_lm <- emmeans(mod_lm, as.formula(paste("~", "Vars_combination")), weights = "equal")
+        emm_mod_lm_cons <- contrast(emm_mod, method = "pairwise", adjust = "tukey") 
+        emm_mod_lm_CI <- confint(emm_mod_lm_cons, adjust = "fdr", level = 0.95, type = "response")
+        colnames(taxa_test_estimates)[seq(2, ncol(taxa_test_estimates), by = 5)] <-
+          str_split(emm_mod_lm_CI$contrast, " - ", simplify = TRUE)[, 1]
+        colnames(taxa_test_estimates)[seq(3, ncol(taxa_test_estimates), by = 5)] <-
+          str_split(emm_mod_lm_CI$contrast, " - ", simplify = TRUE)[, 2]
+        taxa_test_estimates[phy_id, -1] <- as.list(summary(emm_mod_lm)$emmean[match(colnames(taxa_test_estimates), with(summary(emm_mod_lm), get(vars2test[1]):get(vars2test[2])))])[-1]
+         
+        taxa_test_estimates[phy_id, seq(4, ncol(taxa_test_estimates), by = 5)] <- as.list(emm_mod_lm_CI$estimate)
+        taxa_test_estimates[phy_id, seq(5, ncol(taxa_test_estimates), by = 5)] <- as.list(emm_mod_lm_CI$lower.CL)
+        taxa_test_estimates[phy_id, seq(6, ncol(taxa_test_estimates), by = 5)] <- as.list(emm_mod_lm_CI$upper.CL)
+      }
+    }
+    
+    # Correct for FDR for each comparison pair (not needed if adjust has been used in contrast())
+    # for (ps2correct in seq(2, ncol(taxa_test_results), by = 2)) {
+    #   # print(pair)
+    #   taxa_test_results[, ps2correct] <-
+    #     p.adjust(pull(taxa_test_results[, ps2correct]) , method = "BY") # Benjamini, Y., and Yekutieli, D. (2001). The control of the false discovery rate in multiple testing under dependency. Annals of Statistics 29, 1165–1188.
+    #   # calculated by replacing the alpha of the Benjamini-Hochberg procedure by alpha/sum(1/1:m)).
+    #   # we use this and not BH because of dependency in the tests (compositional data)
+    # }
+    # 
+    write.csv(taxa_test_results, file = paste0(outputfile, "_", tax_rank, "_Pvals.csv"))
+    write.csv(taxa_test_estimates, file = paste0(outputfile, "_", tax_rank, "_CI.csv"))
+    Taxa_tests <- list(taxa_test_results, taxa_test_estimates)
+    return(Taxa_tests)
+  }
+
+plotSTAMPR <- function(STAMPR_output = Taxa_tests_phylum1, pair = "City - Slope", tax_level = "Phylum", f_size = 12){
+  require(ggthemes)
+  require(ggpomological)
+  if (!is.list(STAMPR_output) | length(STAMPR_output) != 2) {print("The function accepts only lists with two elements")}
+  
+  pair_number <- which(colnames(STAMPR_output[[1]]) == pair) - 3
+  pvals_col <- pair_number + 3
+  stats_col <- seq(from = 2, to = (ncol(STAMPR_output[[1]]) - 3) * 5, by = 5)[pair_number - 4]
+  
+  bind_cols(STAMPR_output[[1]][, 1], 
+            STAMPR_output[[1]][, pair] ,
+            STAMPR_output[[2]][, stats_col:(stats_col + 4)]
+  ) %>% 
+    mutate(Higher = if_else(.[3] > .[4], colnames(.)[3], colnames(.)[4])) %>% 
+    gather("Factor", `Mean abundance (%)`, 3:4) %>% 
+    mutate_at(c(tax_level, "Higher", "Factor"), ~fct_rev(.)) -> # fct_rev because coord_flip() reverses the order
+    STAMPR_df
+
+    tibble(
+      min = seq(
+        from = 0.5,
+        to = max(as.numeric(pull(STAMPR_df, tax_level))),
+        by = 1
+      ),
+      max = seq(
+        from = 1.5,
+        to = max(as.numeric(pull(STAMPR_df, tax_level))) + 0.5,
+        by = 1
+      )) %>% 
+        add_column(Shade = rep(c(0, 1), length.out = nrow(.))) %>% 
+      mutate_at("Shade", ~as.factor(.)) ->
+    # %>% slice(rep(1:n(), each = 2))
+    #   mutate(col = ifelse(allyrs == TRUE, 1, 0))
+    #   
+      # mutate_at("min", ~case_when(col == 1 ~ . - 0.3, 
+                                       # TRUE ~ .)) %>% 
+      # mutate_at("max", ~case_when(col == 1 ~ . - 0.3, 
+                                       # TRUE ~ .)) -> 
+      shading
+  # ggthemr("grape")
+  p1 <- ggplot() +
+  geom_rect(data = shading,
+            aes(xmin = min, xmax = max, ymin = -Inf, ymax = Inf,
+                fill = Shade, alpha = 0.1), fill = rep(c("white", "#E9EDED"), length.out = nrow(shading)), show.legend = F) + 
+  geom_col(data = STAMPR_df, 
+           mapping = aes(!! sym(tax_level), y = `Mean abundance (%)`, fill = Factor), 
+           width = 0.8, 
+           position = position_dodge(),
+           alpha = 2/3) + 
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_discrete(expand = c(0, 0)) +
+    coord_flip() + 
+    geom_rangeframe(data = STAMPR_df, aes(!! sym(tax_level), y = `Mean abundance (%)`), sides = "b") +
+    scale_fill_manual(values = Gradient.colours[c(6, 5)])  +
+    theme_tufte(base_size = f_size, base_family = "sans") +
+    theme(legend.position = "top",
+          legend.justification = 'left',
+          legend.title = element_blank()) +
+    guides(fill = guide_legend(reverse = TRUE))
+          # panel.grid.major.x = element_line(colour = "white"),
+          # panel.ontop = TRUE)
+
+  p2 <- ggplot() +
+    geom_rect(
+      data = shading,
+      aes(
+        xmin = min,
+        xmax = max,
+        ymin = -Inf,
+        ymax = Inf,
+        fill = Shade,
+        alpha = 0.1
+      ),
+      fill = rep(c("white", "#E9EDED"), length.out = nrow(shading)),
+      show.legend = F
+    ) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "slategray", size = 1, alpha = 2/3) + 
+    geom_errorbar(data = STAMPR_df,
+                  aes(
+                    !! sym(tax_level),
+                    ymin = `low CI`,
+                    ymax = `high CI`,
+                    colour = Higher),
+                  width = 0.3,
+                  alpha = 2/3
+    ) +
+    geom_point(data = STAMPR_df,
+               aes(!! sym(tax_level), 
+                   y = `Estimate diff.`, 
+                   colour = Higher),
+               size = 4,
+               alpha = 2/3) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_discrete(
+      expand = c(0, 0),
+      breaks = STAMPR_df[[tax_level]],
+      labels = formatC(deframe(STAMPR_df[, 2]), format = "e", digits = 2),
+      position = "top"
+    ) +
+    geom_rangeframe(data = STAMPR_df, aes(!! sym(tax_level), y = seq(
+      min(`low CI`),
+      max(`high CI`),
+      length.out = nrow(STAMPR_df)
+    )), sides = "b") +
+    scale_colour_manual(values = Gradient.colours[c(6, 5)])  +
+    theme_tufte(base_size = f_size, base_family = "sans") +
+    theme(legend.position = "none", 
+          plot.title = element_text(margin = margin(10, 0, 18, 0), hjust = 0.5),
+          axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 20, l = 0), angle = 180)) + # BUG: no response
+    labs(title = "95% confidence intervals", 
+         y = "Difference in mean abundance (%)",
+         x = "p-value (corrected)") +
+    coord_flip()
+
+  # p1 + p2 + plot_layout(widths = c(1, 2)) # doesn't look as good
+  plot_grid(p1, p2, rel_widths = c(2, 3))
+  # ggthemr_reset()
+}
+
+DropRareSpecies <- function(Ps_obj = Ps_obj_filt_median, prevalence = 0.1) {
+  # calculate sequence prevalence   
+  prevdf <- apply( 
+    X = otu_table(Ps_obj),
+    MARGIN = ifelse(taxa_are_rows(Ps_obj), yes = 1, no = 2),
+    FUN = function(x) {sum(x > 0)}
+    )
+  # Add taxonomy and total read counts to this data.frame
+  prevdf <- data.frame(
+    Prevalence = prevdf,
+    TotalAbundance = taxa_sums(Ps_obj),
+    tax_table(Ps_obj)
+  )
+  
+  # Define prevalence threshold as a fraction of the total samples
+  prevalenceThreshold <- prevalence * nsamples(Ps_obj)
+  prevalenceThreshold
+  
+  # Execute prevalence filter, using `prune_taxa()` function
+  prevdf_phylum_filt <-
+    subset(prevdf,
+           Phylum %in% get_taxa_unique(Ps_obj, "Phylum"))
+  keepTaxa <-
+    row.names(prevdf_phylum_filt)[(prevdf_phylum_filt$Prevalence >= prevalenceThreshold)]
+  Ps_obj_small <- prune_taxa(keepTaxa, Ps_obj)
+  sample_data(Ps_obj_small)$Lib.size <-
+    rowSums(otu_table(Ps_obj_small))
+  print(Ps_obj)
+  print(Ps_obj_small)
+  return(Ps_obj_small)
+}
+
+CalcALDEx <- function(physeq_obj = Ps_obj_filt_subset, vars2test = "Spill.Treatment", ...) {
+  physeq_obj <- filter_taxa(physeq_obj, function(x) sum(x) > 0, TRUE)
+  # physeq_obj <- prune_taxa(sig_taxa, physeq_obj) # remove taxa not significant under the full model
+  data2test <- t(otu_table(physeq_obj))
+  comparison <- as.character(get_variable(physeq_obj, vars2test))
+  ALDEx <- aldex.clr(
+    data2test,
+    comparison,
+    mc.samples = 128,
+    denom = "iqlr", # iqlr for slight assymetry in composition
+    verbose = TRUE,
+    useMC = TRUE
+  ) 
+  ALDEx_tt <- aldex.ttest(ALDEx, comparison, paired.test = FALSE) # for two conditions
+  ALDEx_effect <- aldex.effect(
+    ALDEx,
+    comparison,
+    include.sample.summary = TRUE,
+    verbose = TRUE,
+    useMC = TRUE
+  ) # estimate effect sizes
+  ALDEx_out <- list(ALDEx_tt = ALDEx_tt, ALDEx_effect = ALDEx_effect) 
+  return(ALDEx_out)
+}
+
+PrepALDExData <- function(ALDEx_tt, ALDEx_effect, physeq_obj = Ps_obj_filt_subset, sig_level = 0.05, LFC = 0.322, rare_phyla = Rare_phyla, Taxa_rank, ...) {
+  ALDEx2plot <- data.frame(ALDEx_tt, ALDEx_effect) # merge results
+  # group dataframe by OTU, calculate median rel. abundance
+  physeq_obj %>%
+    transform_sample_counts(., function(x) x / sum(x) * 100) %>% 
+    taxa_sums(.) %>% 
+    map_dbl(~(.x / nsamples(physeq_obj))) %>% 
+    enframe(name = "OTU", value = "baseMean") -> 
+    baseMean
+  
+  ALDEx2plot$OTU <- rownames(ALDEx2plot)
+  ALDEx2plot %<>% left_join(., baseMean, by = "OTU") # add mean abundance to results table
+  ALDEx2plot %<>% cbind(., tax_table(physeq_obj)[taxa_names(physeq_obj) %in% ALDEx2plot$OTU, ], stringsAsFactors = FALSE) # add taxonomy
+  # change their name to "Rare"
+  
+  ALDEx2plot[ALDEx2plot$Phylum %in% rare_phyla, ]$Phylum <- 'Rare' # rare_phyla is calcuted for the taxa box plots
+  ALDEx2plot$Significance <- factor("Fail", levels = c("Fail", "Pass")) # define significance factor
+  ALDEx2plot$Significance[ALDEx2plot$wi.eBH < sig_level &
+                            !is.na(ALDEx2plot$wi.eBH) &
+                            abs(ALDEx2plot$effect) > LFC] <- "Pass"
+  # ALDEx2plot$Significance <- as.factor(sapply(ALDEx2plot$wi.eBH, function(x) if (is.na(x) | x > 0.05) {x <- "Fail"} else {x <- "Pass"}))
+  # Rank by taxa abundance
+  ALDEx2plot$Phylum %<>%
+    factor(., levels = Taxa_rank$Phylum) %>%  # Taxa_rank is calcuted for the taxa box plots
+    fct_relevel(., "Rare", after = Inf)
+  return(ALDEx2plot)
+}
+
+GGPlotALDExTax <- function(ALDEx2plot, OTU_labels = FALSE, Taxa = "Phylum", Y_val = "effect", sig_level = 0.1) {
+  pos <- position_jitter(width = 0.3, seed = 1)
+  p <-
+    ggplot(ALDEx2plot) +
+    geom_point(aes_string(
+             x = Taxa,
+             y = Y_val,
+             colour = "Significance",
+             size = "baseMean"),
+             position = pos, 
+             alpha = 2 / 3, 
+             stroke = 0) +
+    xlab("") +
+    ylab(expression(paste("Effect size (lo", g[2], " fold change)"))) +
+    # ylab("Fold change") +
+    labs(colour = paste("Significance at \n p <", sig_level), size = "Mean abundance (%)") +
+    theme_grey(base_size = 18,  base_family = "sans") +
+    theme(axis.text.x = element_text(angle = 45.0, vjust = 1, hjust = 1)) +
+    guides(colour = guide_legend(override.aes = list(size = 5))) +
+    scale_colour_manual(values = c(ggpomological:::pomological_base[[7]], ggpomological:::pomological_palette[[1]])) +
+    scale_size_continuous(range = c(1, 5), breaks = c(1, 2.5, 5, 10))
+  
+  if (OTU_labels) {
+    p <- p + geom_label_repel(
+      aes_string(x = Taxa, y = Y_val),
+      size = 6,
+      label = sub("Seq_([0-9]+)", "\\1", ALDEx2plot[ALDEx2plot$Significance == "Pass", "OTU"]),
+      position = pos,
+      data = ALDEx2plot[ALDEx2plot$Significance == "Pass", ],
+      # nudge_x = 0.4,
+      colour = "#4a4a4a",
+      label.size = NA, 
+      alpha = 0.75, 
+      # fontface = 'bold',
+      box.padding = 0.80,
+      point.padding = 0.5
+      
+    )
+  }
+  return(p)
+}
+
+GGPlotOTU <- function(physeq_obj = Ps_obj_filt_subset_New_Oil_Control, vars2test = "Spill.Treatment", OTU_name = "Seq_8"){
+  # adapted from https://link.springer.com/protocol/10.1007%2F978-1-4939-8728-3_10
+  require("phyloseq")
+  require("ggplot2")
+  require("ggpomological")
+  # Get Proportion transform
+  otuRA <- transform_sample_counts(physeq_obj, function(x) x/sum(x))
+  gtab <- tibble(
+    Count = get_sample(physeq_obj, i = OTU_name),
+    Proportion = get_sample(otuRA, i = OTU_name),
+    SAMPLE_ID = unlist(get_variable(physeq_obj, "Joint.sample.name")),
+    TREATMENT = get_variable(physeq_obj, vars2test)
+  )
+  suppressWarnings({
+    mgtab <- gather(
+      gtab,
+      "Count", "Proportion",
+      key = "Type",
+      value = "Abundance",
+    )
+  })
+  # detect if pairs are both zero
+  mgtab %<>% group_by(SAMPLE_ID) %>% mutate(., BothZero := all(Abundance == 0))
+  
+  # Create a dummy min-value for display
+  mgtab %<>% group_by(Type) %>% mutate(Zero = min(Abundance[(Abundance > 0.0)], na.rm = TRUE)/10)
+  mgtab %<>% group_by(SAMPLE_ID) %>% mutate(Abundance = replace(Abundance, Abundance == 0.0, Zero[Abundance == 0.0]))
+
+  
+  pointSize <- 3
+  p <- ggplot(data = mgtab,
+             mapping = aes(
+               x = TREATMENT, 
+               y = Abundance,
+               color = TREATMENT,
+               shape = TREATMENT)) + 
+    facet_wrap(~Type, scales = "free_y") +
+    # Not both zero
+    geom_point(
+      data = filter(mgtab, BothZero == FALSE),
+      size = pointSize, 
+      alpha = 0.8) +
+    # Both Zero
+    geom_point(
+      data = filter(mgtab, BothZero == TRUE),
+      size = pointSize, 
+      alpha = 0.8,
+      position = position_jitter(width = 0.2, height = 0)) + 
+    geom_path(
+      data = filter(mgtab, BothZero == FALSE),
+      mapping = aes(group = SAMPLE_ID), 
+      color = "darkgray", 
+      size = 0.25,
+      position = position_jitter(width = 0, height = 0.001)) + 
+    geom_text(mapping = aes(label = SAMPLE_ID),
+              data = filter(mgtab, TREATMENT == levels(gtab$TREATMENT)[1] & Abundance > Zero),
+              color = "black",
+              size = 2,
+              nudge_x = -0.15) +
+    scale_colour_manual(values = c(ggpomological:::pomological_base[[7]], ggpomological:::pomological_palette[[1]])) +
+    # scale_y_sqrt() +
+    scale_y_log10() +
+    theme_bw() + 
+    theme(text = element_text(size = f_size),
+          legend.position = "none") +
+    scale_size_continuous(range = c(2, 5))
+    # ggtitle(paste("Abundance plot for OTU", OTU))
+  return(p)
+}
+
+GGPlotTopOTUs <- function(physeq_obj = Ps_obj_filt_subset_New_Oil_Control, 
+                          ALDEx_obj = ALDEx2plot_New_Oil_Control, 
+                          vars2test = "Spill.Treatment", 
+                          tax_level = "Order", 
+                          rank_by = "effect", 
+                          Ntop = 12,
+                          Connect = TRUE){
+  # adapted from https://link.springer.com/protocol/10.1007%2F978-1-4939-8728-3_10
+  require("phyloseq")
+  require("ggplot2")
+  require("ggpomological")
+  
+  # Rank OTUs according to rank_by
+  ALDEx_obj %>% 
+  filter(Significance == "Pass") %>% 
+  dplyr::select(OTU, !! sym(tax_level), baseMean, effect) %>%
+  arrange(desc(abs(!! sym(rank_by)))) -> OTU_rank
+    if (nrow(OTU_rank) < Ntop) Ntop <- nrow(OTU_rank)
+  OTU_rank %>% .[1:Ntop, ] %>% pull(OTU) -> OTU_names
+  
+  # Get rel. abund. transform
+  otuRA <- transform_sample_counts(physeq_obj, function(x) x/sum(x) * 100)
+
+  if (is.na(OTU_names[1]) | is.null(OTU_names[1])) {
+    message("No significant differentially abundant OTUs to display")
+  } else {
+    if (length(OTU_names) == 1) {
+      gtab <- tibble(
+        OTU =  as_factor(OTU_names),
+        # Count = gather(as_tibble(get_sample(physeq_obj, i = OTU_names)))$value,
+        Rel_abundance = gather(as_tibble(get_sample(otuRA, i = OTU_names)))$value,
+        SAMPLE_ID = as_factor(rep(unlist(get_variable(otuRA, "Joint.sample.name")), Ntop)),
+        TREATMENT = as_factor(rep(get_variable(otuRA, vars2test), Ntop)))
+      } else {
+      gtab <- tibble(
+        OTU =  as_factor(gather(as_tibble(get_sample(otuRA, i =
+                                                       OTU_names)))$key),
+        # Count = gather(as_tibble(get_sample(otuRA, i = OTU_names)))$value,
+        Rel_abundance = gather(as_tibble(get_sample(otuRA, i = OTU_names)))$value,
+        SAMPLE_ID = as_factor(rep(unlist(get_variable(otuRA, "Joint.sample.name")), Ntop)),
+        TREATMENT = as_factor(rep(get_variable(otuRA, vars2test), Ntop)))
+    }
+
+  gtab %<>% group_by(SAMPLE_ID, OTU) %>% mutate(., BothZero := all(Rel_abundance == 0))
+  
+  # Create a dummy min-value for display
+  gtab %<>% group_by(OTU) %>% mutate(Zero = min(Rel_abundance[(Rel_abundance > 0.0)], na.rm = TRUE)/10)
+  gtab %<>% group_by(SAMPLE_ID, OTU) %>% mutate(Rel_abundance = replace(Rel_abundance, Rel_abundance == 0.0, Zero[Rel_abundance == 0.0]))
+  gtab$SAMPLE_ID
+  
+  pointSize <- 3
+  p <- ggplot(data = gtab,
+             mapping = aes(
+               x = TREATMENT, 
+               y = Rel_abundance,
+               color = TREATMENT,
+               shape = TREATMENT)) + 
+    facet_wrap(~OTU, scales = "free_y") +
+    # Not both zero
+    geom_point(
+      data = filter(gtab, BothZero == FALSE),
+      size = pointSize, 
+      alpha = 0.8) +
+    # Both Zero
+    geom_point(
+      data = filter(gtab, BothZero == TRUE),
+      size = pointSize, 
+      alpha = 0.8) +
+      #position = position_jitter(width = 0.2, height = 0)) + # looks weird
+    geom_text(mapping = aes(label = SAMPLE_ID),
+              data = filter(gtab, TREATMENT == levels(gtab$TREATMENT)[1]), # & Rel_abundance > Zero
+              color = "black",
+              size = 2,
+              nudge_x = -0.2) +
+    scale_colour_manual(values = c(ggpomological:::pomological_base[[7]], ggpomological:::pomological_palette[[1]])) +
+    # scale_y_sqrt() +
+    scale_y_log10() +
+    theme_bw() + 
+    theme(text = element_text(size = 14),
+          legend.position = "none") +
+    scale_size_continuous(range = c(2, 5)) +
+    ylab("Abundance (%)")
+  
+  if (Connect) {
+    p <- p +     geom_path(
+      data = filter(gtab, BothZero == FALSE),
+      mapping = aes(group = SAMPLE_ID),
+      color = "darkgray",
+      size = 0.25,
+      position = position_jitter(width = 0, height = 0.001)) 
+  }
+    # ggtitle(paste("Abundance plot for OTU", OTU))
+  return(p)
+  }
+}
+
+gz <- function (in_path, out_path = tempfile()) 
+{
+  # Compress a file using gz and delete the uncompressed file
+  out <- gzfile(out_path, "w")
+  writeLines(readLines(in_path), out)
+  close(out)
+  file.remove(in_path)
+  invisible(out_path)
+}
+
+GGPlotCorncob <- function(da_df, OTU_labels = FALSE, Taxa = "Phylum", Y_val = "Differential abundance", sig_level = 0.05, Rank = Taxa_rank) {
+  require(magrittr)
+  require(ggplot2)
+  
+  require(see)
+  
+  pos <- position_jitter(width = 0.1, seed = 1)
+  da_df %<>% 
+    mutate_at(vars(matches(Taxa)), as_factor) %>%  
+    mutate(!!Taxa := fct_relevel(get(Taxa), pull(Rank, !!Taxa))) %>% # Taxa_rank is calcuted for the taxa box plots
+    mutate(!!Taxa := fct_relevel(get(Taxa), "Rare", after = Inf)) 
+  
+  p <-
+    ggplot(da_df) +
+    geom_point2(aes(
+      x = !!sym(Taxa),
+      y = !!sym(Y_val),
+      colour = !!sym("Significance"),
+      size = !!sym("Mean abundance (%)")),
+      position = pos, 
+      alpha = 2 / 3, 
+      stroke = 0) +
+    geom_linerange(aes(x = !!sym(Taxa),
+                        y = !!sym(Y_val),
+                        ymin = `ymin`,
+                        ymax = `ymax`,
+                        colour = !!sym("Significance")),
+                    position = pos,
+                    alpha = 1/5, 
+                    show.legend = FALSE) +
+    xlab("") +
+    # ylab(expression(paste("Effect size (lo", g[2], " fold change)"))) +
+    ylab("Differential abundance") +
+    labs(colour = paste("Significance at \n p <", sig_level), size = "Mean abundance (%)") +
+    theme_grey(base_size = 18,  base_family = "sans") +
+    theme(axis.text.x = element_text(angle = 45.0, vjust = 1, hjust = 1)) +
+    guides(colour = guide_legend(override.aes = list(size = 5))) +
+    scale_colour_manual(values = c(ggpomological:::pomological_base[[7]], ggpomological:::pomological_palette[[1]])) +
+    scale_size_continuous(range = c(1, 5), breaks = c(1, 2.5, 5, 10, 20))
+  
+  if (OTU_labels) {
+    p <- p + geom_label_repel(
+      aes(x = !!sym(Taxa), y = !!sym(Y_val)),
+      size = 6,
+      label = sub("Seq_([0-9]+)", "\\1", pull(da_df[da_df$Significance == "Pass", ], "OTU")),
+      position = pos,
+      data = da_df[da_df$Significance == "Pass", ],
+      # nudge_x = 0.4,
+      colour = "#4a4a4a",
+      label.size = NA, 
+      alpha = 0.75, 
+      # fontface = 'bold',
+      box.padding = 0.80,
+      point.padding = 0.5
+    )
+  }
+  return(p)
+}
+```
+
+### Setting general parameters:
+```{r general parameters}
+# set.seed(1000)
+# min_lib_size <- 5000
+# topN <- 1000 # number of most-abundant ASVs to subset
+bootstraps <- 1000
+data_path <- "../Data/"
+Proj_name <- "Shivta_archaeological_dating"
+Ps_file <- paste0(Proj_name, "_16S_filt3_wTree.RDS")
+
+pom4 <- ggpomological:::pomological_palette[c(2, 1, 9, 3)]
+pom2 <- c(ggpomological:::pomological_base[[7]], ggpomological:::pomological_palette[[1]])
+
+Desert.colours <- RColorBrewer::brewer.pal(n = 9, "YlOrBr")[9:6]
+Grassland.colours <- RColorBrewer::brewer.pal(n = 9, "YlGn")[9:6]
+Subnival.colours <- RColorBrewer::brewer.pal(n = 9, "YlGnBu")[9:6]
+Gradient.colours <- c(Desert.colours[1], Grassland.colours[1], Desert.colours[2], Grassland.colours[2], Desert.colours[3], Grassland.colours[3], Desert.colours[4], Grassland.colours[4], Subnival.colours)
+```
+
+## Description
+This script reproduces all sequence analysis steps and plots included in the paper plus some additional exploratory analyses.
+The analysis is heavily based on the phyloseq package [@mcmurdie_phyloseq_2013], but also on many other R packages.
+
+**Load data**
+```{r load data, cache=TRUE}
+OTUmat <- t(read.csv(paste0(data_path, "Shivta_site_otuTab2.txt"), header = TRUE, row.names = 1))
+sort.order <- as.numeric( gsub( "OTU([0-9]+)", "\\1", colnames( OTUmat ) ) )
+OTUmat <- OTUmat[, order( sort.order )]
+
+Metadata <- read.csv(paste0(data_path, "Shivta_metadata.csv"), row.names = 1, header = TRUE)
+
+read_csv(paste0(data_path, "Shivta_metadata.csv"),
+                     trim_ws = TRUE) %>%
+  mutate_at(
+    c(
+      "Rock.type",
+      "Location"
+    ), 
+    ~(factor(.))
+  ) %>% 
+  column_to_rownames("Sample.code") ->
+  Metadata
+
+
+row.names(OTUmat) <- gsub("(.*)Nimrod[0-9]+|Osnat[0-9]+", "\\1", row.names( OTUmat))
+Metadata <- Metadata[order(row.names(Metadata)), ]
+OTUmat <- OTUmat[order(row.names(OTUmat)), ]
+# calculate sample size
+Metadata$Library.size = rowSums(OTUmat)
+# row.names(OTUmat) <- row.names(Metadata)
+Metadata$Location.rock <- with(Metadata, Location:Rock.type)
+
+# Load taxonomy data
+tax.file <- "Shivta_site_silva.nrv119.taxonomy"
+Taxonomy <- read.table(tax.file, stringsAsFactors = FALSE) # read taxonomy file
+
+# count how many ';' in each cell and add up to 6
+for (i in 1:nrow(Taxonomy)){
+  semicolons <- length(gregexpr(";", Taxonomy$V2[i] )[[1]])
+  if (semicolons < 6){
+    x <- paste0( rep("Unclassified;", 6 - semicolons ), collapse = "")
+    Taxonomy$V2[i] <- paste0( Taxonomy$V2[i], x, sep = "")
+  }
+}
+# split taxonomy to columns
+do.call( "rbind", strsplit( Taxonomy$V1, ";", fixed = TRUE)) %>% 
+  gsub( "size=([0-9]+)", "\\1", .) %>%
+  data.frame( ., do.call( "rbind", strsplit( Taxonomy$V2, ";", fixed = TRUE)), stringsAsFactors = F) %>% 
+  apply(., 2, function(x) gsub( "\\(.*\\)", "", x)) %>% 
+  replace(., . == "unclassified", "Unclassified") -> 
+  Taxonomy
+colnames( Taxonomy ) <- c( "OTU", "Frequency", "Domain", "Phylum", "Class", "Order", "Family", "Genus" )
+# rownames(Taxonomy) <- colnames(Rock_weathering_OTUmat)
+rownames(Taxonomy) <- Taxonomy[, 1]
+
+Tree_IQ <- read_tree(paste0(data_path, "Shivta_site_otuReps.filtered.align.treefile"))
+
+# generate phyloseq object
+Ps_obj <- phyloseq(otu_table(OTUmat, taxa_are_rows = FALSE),
+                   tax_table(Taxonomy[, -c(1, 2)]),
+                   sample_data(Metadata),
+                   phy_tree(Tree_IQ)
+)
+# Reorder factors for plotting
+sample_data(Ps_obj)$Location %<>% fct_relevel("Slope", "City")
+```
+
+Remove samples not for analysis and un- and mis-classified sequences
+```{r remove samples, cache=T}
+# samples2remove <- c(2, 3, 4, 5, 6, 7, 8, 10, 12) 
+# Ps_obj <- subset_samples(Ps_obj, !grepl(paste(c(sample_names(Ps_obj)[samples2remove]), collapse = "|"), sample_names(Ps_obj)))
+# Rock_dust <- filter_taxa(Ps_obj, function(x) sum(x) > 0, TRUE)
+domains2remove <- c("", "Eukaryota", "Unclassified")
+classes2remove <- c("Chloroplast")
+families2remove <- c("Mitochondria")
+Ps_obj_filt <- subset_taxa(Ps_obj, !is.na(Phylum) &
+                        !Domain %in% domains2remove &
+                      !Class %in% classes2remove &
+                      !Family %in% families2remove)
+```
+
+### Inspect library size and number of ASV
+```{r Library Sizes, cache=T}
+Ps_obj_df <-
+  as.data.frame(sample_data(Ps_obj_filt)) # Put sample_data into a ggplot-friendly data.frame
+Ps_obj_df <- Ps_obj_df[order(Ps_obj_df$Library.size), ]
+Ps_obj_df$Index <- seq(nrow(Ps_obj_df))
+ggplot(data = Ps_obj_df, 
+       aes(x = Index, y = Library.size, color = Location.rock)) + 
+  geom_point(size = 4) + 
+  scale_colour_manual(values = pom4, name = "Location.rock")
+summary(sample_sums(Ps_obj_filt))
+summary(taxa_sums(Ps_obj_filt))
+```
+
+First let's explore the prevalence of different taxa in the database.
+```{r explore prevalence, cache=T}
+prevdf <- apply(X = otu_table(Ps_obj_filt),
+                 MARGIN = ifelse(taxa_are_rows(Ps_obj_filt), yes = 1, no = 2),
+                 FUN = function(x){sum(x > 0)})
+# Add taxonomy and total read counts to this data.frame
+prevdf <- data.frame(Prevalence = prevdf,
+                      TotalAbundance = taxa_sums(Ps_obj_filt),
+                      tax_table(Ps_obj_filt))
+prevdf %>%
+  group_by(Phylum) %>%
+  summarise(`Mean prevalence` = mean(Prevalence),
+            `Sum prevalence` = sum(Prevalence)) ->
+  Prevalence_phylum_summary
+
+Prevalence_phylum_summary %>% 
+  kable(., digits = c(0, 1, 0)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = F)
+
+prevdf %>%
+  group_by(Order) %>%
+  summarise(`Mean prevalence` = mean(Prevalence),
+            `Sum prevalence` = sum(Prevalence)) ->
+  Prevalence_Order_summary
+
+Prevalence_Order_summary %>% 
+  kable(., digits = c(0, 1, 0)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = F)
+```
+
+Based on that we'll remove all phyla with a prevalence of under 8
+```{r remove rare taxa, cache=T}
+Prevalence_phylum_summary %>% 
+  filter(`Sum prevalence` < 8) %>% 
+  dplyr::select(Phylum) %>% 
+  map(as.character) %>% 
+  unlist() ->
+  filterPhyla
+Ps_obj_filt %<>% subset_taxa(!Phylum %in% filterPhyla)
+sample_data(Ps_obj_filt)$Library.size <- rowSums(otu_table(Ps_obj_filt))
+print(Ps_obj)
+print(Ps_obj_filt)
+```
+
+Plot general prevalence features of the phyla
+```{r prevalence phylum, cahce=T, fig.height=12, fig.width=10}
+# Subset to the remaining phyla
+prevdf_phylum_filt <- subset(prevdf, Phylum %in% get_taxa_unique(Ps_obj_filt, "Phylum"))
+ggplot(prevdf_phylum_filt,
+       aes(TotalAbundance, Prevalence / nsamples(Ps_obj_filt), color = Phylum)) +
+  # Include a guess for parameter
+  geom_hline(yintercept = 0.05,
+             alpha = 0.5,
+             linetype = 2) + geom_point(size = 2, alpha = 0.7) +
+  scale_x_log10() +  xlab("Total Abundance") + ylab("Prevalence [Frac. Samples]") +
+  facet_wrap( ~ Phylum) + theme(legend.position = "none")
+```
+
+Plot general prevalence features of the top 20 orders
+```{r prevalence order, cache=T, fig.height=12, fig.width=10}
+# Subset to the remaining phyla
+prevdf_order_filt <- subset(prevdf, Order %in% get_taxa_unique(Ps_obj_filt, "Order"))
+# grab the top 30 most abundant orders
+prevdf_order_filt %>% 
+  group_by(Order) %>%
+  summarise(Combined.abundance = sum(TotalAbundance)) %>% 
+  arrange(desc(Combined.abundance)) %>% 
+  .[1:30, "Order"]  ->
+  Orders2plot
+prevdf_order_filt2 <- subset(prevdf, Order %in% Orders2plot$Order)
+ggplot(prevdf_order_filt2,
+       aes(TotalAbundance, Prevalence / nsamples(Ps_obj_filt), color = Order)) +
+  # Include a guess for parameter
+  geom_hline(yintercept = 0.05,
+             alpha = 0.5,
+             linetype = 2) + geom_point(size = 2, alpha = 0.7) +
+  scale_x_log10() +  xlab("Total Abundance") + ylab("Prevalence [Frac. Samples]") +
+  facet_wrap( ~ Order) + theme(legend.position = "none")
+```
+
+#### Unsupervised filtering by prevalence
+We'll remove all sequences which appear in less than 10% of the samples
+```{r unsupervised filtering, cache=T}
+# Define prevalence threshold as 10% of total samples
+prevalenceThreshold <- 0.1 * nsamples(Ps_obj_filt)
+prevalenceThreshold
+# Execute prevalence filter, using `prune_taxa()` function
+keepTaxa <-
+  row.names(prevdf_phylum_filt)[(prevdf_phylum_filt$Prevalence >= prevalenceThreshold)]
+Ps_obj_filt  %<>%  prune_taxa(keepTaxa, .)
+sample_data(Ps_obj_filt)$Library.size <- rowSums(otu_table(Ps_obj_filt))
+print(Ps_obj)
+print(Ps_obj_filt)
+```
+This removed `r ntaxa(Ps_obj) - ntaxa(Ps_obj_filt)` or `r percent(1 - (ntaxa(Ps_obj_filt) /  ntaxa(Ps_obj)))` of the sequences.
+
+### Exploring the dataset features
+First let's look at the count data distribution
+```{r plot abundance, cache=T}
+PlotLibDist(Ps_obj_filt)
+
+sample_data(Ps_obj_filt) %>% 
+  as_tibble() %>% 
+  dplyr::select(Sample.name, Library.size) %>% 
+  as(., "data.frame") %>% 
+  kable(.) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = F)
+```
+The figure and table indicate only a small deviation in the number of reads per samples.
+
+```{r mod abundance, cache=T, fig.asp=.8}
+(mod1 <- adonis(
+  otu_table(Ps_obj_filt) ~ Library.size,
+  data = as(sample_data(Ps_obj_filt), "data.frame"), 
+  method = "bray",
+  permutations = 9999
+))
+PlotReadHist(as(otu_table(Ps_obj_filt), "matrix"))
+notAllZero <- (rowSums(t(otu_table(Ps_obj_filt))) > 0)
+vsn::meanSdPlot(as.matrix(log2(t(otu_table(Ps_obj_filt))[notAllZero, ] + 1)))
+```
+
+The difference in library sizes is low and its effect on the community composition is minimal. Consequently, rarefaction should probably be good enough and will not bias the results.
+
+We'll use the GMPR method [@chen_gmpr:_2017]
+```{r GMPR, cache=T}
+Ps_obj_filt_GMPR <- Ps_obj_filt
+Ps_obj_filt %>%
+  otu_table(.) %>%
+  t() %>%
+  as(., "matrix") %>%
+  GMPR() ->
+  GMPR_factors
+Ps_obj_filt %>%
+  otu_table(.) %>%
+  t() %*% diag(1 / GMPR_factors$gmpr) %>%
+  t() %>%
+  as.data.frame(., row.names = sample_names(Ps_obj_filt)) %>%
+  otu_table(., taxa_are_rows = FALSE) ->
+  otu_table(Ps_obj_filt_GMPR)
+sample_data(Ps_obj_filt_GMPR)$Library.size <- sample_sums(Ps_obj_filt)
+adonis(
+  otu_table(Ps_obj_filt_GMPR) ~ Library.size,
+  data = as(sample_data(Ps_obj_filt_GMPR), "data.frame"),
+  method = "bray",
+  permutations = 9999
+)
+PlotLibDist(Ps_obj_filt_GMPR)
+```
+
+```{r GMPR diag plots, cache=T, fig.asp=.8}
+PlotReadHist(as(otu_table(Ps_obj_filt_GMPR), "matrix"))
+notAllZero <- (rowSums(t(otu_table(Ps_obj_filt_GMPR))) > 0)
+vsn::meanSdPlot(as.matrix(log2(t(otu_table(Ps_obj_filt_GMPR))[notAllZero, ] + 1)))
+```
+
+### Alpha diversity 
+Calculate and plot alpha diversity metrics.
+```{r alpha-div, cache=T, fig.width=20, fig.height=10}
+rarefaction.mat <- matrix(0, nrow = nsamples(Ps_obj_filt), ncol = bootstraps)
+rownames(rarefaction.mat) <- sample_names(Ps_obj_filt)
+rich.ests <- list(S.obs = rarefaction.mat, S.chao1 = rarefaction.mat, se.chao1 = rarefaction.mat,
+                   S.ACE = rarefaction.mat, se.ACE = rarefaction.mat)
+for (i in seq(bootstraps)) {
+  sub.OTUmat <- rrarefy(otu_table(Ps_obj_filt), min(rowSums(otu_table(Ps_obj_filt))))
+  for (j in seq(length(rich.ests))) {
+    rich.ests[[j]][, i] <- t(estimateR(sub.OTUmat))[, j]
+  }
+}
+Richness <- data.frame(row.names = row.names(rich.ests[[1]]))
+for (i in c(1, seq(2, length(rich.ests), 2))) {
+  S <- apply(rich.ests[[i]], 1, mean)
+  if (i == 1) { 
+    se <- apply(rich.ests[[i]], 1, function(x) (mean(x)/sqrt(length(x))))
+    } else se <- apply(rich.ests[[i + 1]], 1, mean)
+  Richness <- cbind(Richness, S, se)
+}
+colnames(Richness) <- c("S.obs", "S.obs.se", "S.chao1", "S.chao1.se", "S.ACE", "S.ACE.se")
+saveRDS(Richness, file = paste0("./", Proj_name))
+write.csv(Richness, file = paste0("./", Proj_name))
+ses <- grep("\\.se", colnames(Richness))
+Richness[, ses] %>% 
+  gather(key = "est.se") -> se.dat
+Richness[, -unique(ses)] %>% 
+  gather(key = "est") -> mean.dat
+n <- length(unique(mean.dat$est))
+# diversity indices
+diversity.inds <- list(Shannon = rarefaction.mat, inv.simpson = rarefaction.mat, BP = rarefaction.mat)
+for (i in seq(bootstraps)) {
+  sub.OTUmat <- rrarefy(otu_table(Ps_obj_filt), min(rowSums(otu_table(Ps_obj_filt))))
+  diversity.inds$Shannon[, i] <- diversityresult(sub.OTUmat, index = 'Shannon', method = 'each site', digits = 3)[, 1]
+  diversity.inds$inv.simpson[, i] <- diversityresult(sub.OTUmat, index = 'inverseSimpson', method = 'each site', digits = 3)[, 1]
+  diversity.inds$BP[, i] <- diversityresult(sub.OTUmat, index = 'Berger', method = 'each site', digits = 3)[, 1]
+}
+Diversity <- data.frame(row.names = row.names(diversity.inds[[1]]))
+for (i in seq(length(diversity.inds))) {
+  S <- apply(diversity.inds[[i]], 1, mean)
+  se <- apply(diversity.inds[[i]], 1, function(x) (mean(x)/sqrt(length(x))))
+  Diversity <- cbind(Diversity, S, se)
+}
+colnames(Diversity) <- c("Shannon", "Shannon.se", "Inv.simpson", "Inv.simpson.se", "BP", "BP.se")
+ses <- grep("\\.se", colnames(Diversity))
+Diversity[, ses] %>% gather(key = "est.se") -> se.dat
+Diversity[, -unique(ses)] %>% gather(key = "est") -> mean.dat
+saveRDS(Diversity, file = paste0("./", Proj_name))
+write.csv(Diversity, file = paste0("./", Proj_name))
+```
+
+Test the differences in alpha diversity.
+```{r test alpha, cache=T}
+# make combined richness diversity
+Richness_Diversity <- cbind(Richness, Diversity)
+ses <- grep("\\.se", colnames(Richness_Diversity))
+Richness_Diversity[, ses] %>% 
+  gather(key = "est.se") -> 
+  se.dat
+Richness_Diversity[, -unique(ses)] %>% 
+  gather(key = "Metric", 
+         value = "Estimate") -> 
+  mean.dat
+Richness_Diversity_long <-
+  cbind(
+    Sample = rep(rownames(Richness_Diversity), times = length(unique(mean.dat$Metric))),
+    mean.dat,
+    lerr = mean.dat$Estimate - se.dat$value,
+    herr = mean.dat$Estimate + se.dat$value
+  )
+Richness_Diversity_long$Metric <-
+  factor(
+    Richness_Diversity_long$Metric,
+    levels = c("S.obs", "S.chao1", "S.ACE", "Shannon", "Inv.simpson", "BP"),
+    labels = c("S obs.", "Chao1", "ACE", "Shannon", "Inv. Simpson" , "Berger Parker")
+  )
+Richness_Diversity_long %<>%
+  cbind(., 
+        sample_data(Ps_obj_filt))
+
+# S Obs
+data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.", ] 
+# mod_data <- TestAlpha(data = data2test, boxcox.trans = TRUE)
+# TukeyHSD(mod_data)
+# factors2test <- c("Location", "Rock.type")
+# (ph_Sobs <- HSD.test(mod_data, factors2test, group = TRUE, console = TRUE))
+# # Richness_Diversity_long$groups[Richness_Diversity_long$Metric == "S obs."] <- ph_Sobs$groups$groups
+# #But the problem is that Tukey assumes varience homogeneity. If we doubt that we should use something like the Games-Howell method. 
+# posthocTGH(y = data2test$Estimate, x = data2test$Location.rock)
+
+(mod_obsS <- TestAlphaV3(filter(Richness_Diversity_long, Metric == "S obs.")))
+# Post-hoc test
+marginal <- emmeans(mod_obsS,
+                   ~ Location : Rock.type)
+summary(marginal)
+contrast(marginal, 
+         method = "pairwise", 
+         adjust = "tukey")
+(obsS_pairwise <- cld(marginal,
+                      alpha = 0.05,
+                      Letters = letters,
+                      adjust = "tukey")) # works with lm but not with two-factor ART
+
+(mod_obsS %>% 
+  anova() %>% 
+  mutate(`Part Eta Sq`=`Sum Sq`/sum(`Sum Sq`) ) ->
+  mod_obsS_ANOVA)
+# pwpp(marginal) # Pairwise P-value plot. Fails for unbalanced design
+emmip(mod_obsS, Location ~ Rock.type)
+# summary(as.glht(pairs(marginal))) # fails because of unbalanced design
+
+# Shannon
+(mod_Shannon <- TestAlphaV3(filter(Richness_Diversity_long, Metric == "Shannon")))
+# Post-hoc test
+marginal <- emmeans(mod_Shannon,
+                   ~ Location : Rock.type)
+summary(marginal)
+contrast(marginal, 
+         method = "pairwise", 
+         adjust = "tukey")
+(Shannon_pairwise <- cld(marginal,
+                      alpha = 0.05,
+                      Letters = letters,
+                      adjust = "tukey")) # works with lm but not with two-factor ART
+
+(mod_Shannon %>% 
+  anova() %>% 
+  mutate(`Part Eta Sq`=`Sum Sq`/sum(`Sum Sq`) ) ->
+  mod_Shannon_ANOVA)
+# pwpp(marginal) # Pairwise P-value plot. Fails for unbalanced design
+emmip(mod_Shannon, Location ~ Rock.type)
+# summary(as.glht(pairs(marginal))) # fails because of unbalanced design
+
+# ACE
+(mod_ACE <- TestAlphaV3(filter(Richness_Diversity_long, Metric == "ACE")))
+# Post-hoc test
+marginal <- emmeans(mod_ACE,
+                   ~ Location : Rock.type)
+summary(marginal)
+contrast(marginal, 
+         method = "pairwise", 
+         adjust = "tukey")
+(ACE_pairwise <- cld(marginal,
+                      alpha = 0.05,
+                      Letters = letters,
+                      adjust = "tukey")) # works with lm but not with two-factor ART
+
+(mod_ACE %>% 
+  anova() %>% 
+  mutate(`Part Eta Sq`=`Sum Sq`/sum(`Sum Sq`) ) ->
+  mod_ACE_ANOVA)
+# pwpp(marginal) # Pairwise P-value plot. Fails for unbalanced design
+emmip(mod_ACE, Location ~ Rock.type)
+# summary(as.glht(pairs(marginal))) # fails because of unbalanced design
+
+#Inv. Simpson
+(mod_InvSim <- TestAlphaV3(filter(Richness_Diversity_long, Metric == "Inv. Simpson")))
+# Post-hoc test
+marginal <- emmeans(mod_InvSim,
+                   ~ Location : Rock.type)
+summary(marginal)
+contrast(marginal, 
+         method = "pairwise", 
+         adjust = "tukey")
+(InvSim_pairwise <- cld(marginal,
+                      alpha = 0.05,
+                      Letters = letters,
+                      adjust = "tukey")) # works with lm but not with two-factor ART
+
+(mod_InvSim %>% 
+  anova() %>% 
+  mutate(`Part Eta Sq`=`Sum Sq`/sum(`Sum Sq`) ) ->
+  mod_InvSim_ANOVA)
+# pwpp(marginal) # Pairwise P-value plot. Fails for unbalanced design
+emmip(mod_InvSim, Location ~ Rock.type)
+# summary(as.glht(pairs(marginal))) # fails because of unbalanced design
+
+
+#Berger Parker
+(mod_BP <- TestAlphaV3(filter(Richness_Diversity_long, Metric == "Berger Parker")))
+# Post-hoc test
+marginal <- emmeans(mod_BP,
+                   ~ Location : Rock.type)
+summary(marginal)
+contrast(marginal, 
+         method = "pairwise", 
+         adjust = "tukey")
+(BP_pairwise <- cld(marginal,
+                      alpha = 0.05,
+                      Letters = letters,
+                      adjust = "tukey")) # works with lm but not with two-factor ART
+
+(mod_BP %>% 
+  anova() %>% 
+  mutate(`Part Eta Sq`=`Sum Sq`/sum(`Sum Sq`) ) ->
+  mod_BP_ANOVA)
+# pwpp(marginal) # Pairwise P-value plot. Fails for unbalanced design
+emmip(mod_BP, Location ~ Rock.type)
+# summary(as.glht(pairs(marginal))) # fails because of unbalanced design
+```
+
+#### Plot all alpha diversity metrics together
+```{r plot alpha, cache=T, fig.width=10, fig.height=6, fig.cap=""}
+Richness_Diversity_long %>% 
+  dplyr::filter(!Metric %in% c("Chao1", "ACE")) %>% 
+    mutate_at(., "Metric", ~fct_recode(., "Observed S" = "S obs.", "Inv. Simpson" = "Inv. Simpson", "Berger Parker" = "Berger Parker")) %>% 
+  mutate_at(., "Metric", ~fct_relevel(., "Observed S", "Inv. Simpson", "Shannon", "Berger Parker")) %>% 
+  droplevels() ->
+  Richness_Diversity_long2plot
+
+p_alpha <- ggplot() +
+  geom_violin(data = Richness_Diversity_long2plot,
+             aes(
+               x = Location,
+               y = Estimate,
+               ymin = lerr,
+               ymax = herr
+             ), colour = "grey",
+              fill = "grey",
+              alpha = 1 / 3) +
+  geom_jitter2(data = Richness_Diversity_long2plot,
+               aes(x = Location,
+               y = Estimate,
+               ymin = lerr,
+               ymax = herr,
+               colour = Location), size = 3, width = 0.2, alpha = 2/3) +
+  scale_colour_manual(values = Gradient.colours[c(5, 6, 11)], name = "") +
+  # geom_errorbar(alpha = 1 / 2, width = 0.3) +
+  xlab("") +
+  ylab("") +
+  theme(axis.text.x = element_text(
+    angle = 45,
+    vjust = 0.9,
+    hjust = 1
+  ),
+  legend.position="none") +
+  facet_grid(Metric ~ Rock.type, scale = "free") +
+  background_grid(major = "y",
+                  minor = "none",
+                  size.major = 0.8) 
+
+dat_text <- data.frame(
+  label = str_remove_all(c(obsS_pairwise$.group[1:4], 
+                           Shannon_pairwise$.group[1:4], 
+                           InvSim_pairwise$.group[1:4],
+                           BP_pairwise$.group[1:4]), 
+                         pattern = " "),
+  Metric = fct_inorder(rep(levels(Richness_Diversity_long2plot$Metric), each = 4)),
+  Rock.type = fct_c(obsS_pairwise$Rock.type[1:4], 
+                           Shannon_pairwise$Rock.type[1:4], 
+                           InvSim_pairwise$Rock.type[1:4],
+                           BP_pairwise$Rock.type[1:4]), 
+  x = fct_c(obsS_pairwise$Location[1:4], 
+                           Shannon_pairwise$Location[1:4], 
+                           InvSim_pairwise$Location[1:4],
+                           BP_pairwise$Location[1:4]),
+  # x     = as.factor(levels(Richness_Diversity_long2plot$Climate.Source)),
+  y = rep(c(520, 45, 5.2, 0.52), each = 4)
+  # y = rep(c(40, 140, 0.5), each = 6)
+)
+p_alpha <- p_alpha + geom_text(
+  data = dat_text,
+  mapping = aes(x = x, y = y, label = label),
+  nudge_x = 0,
+  nudge_y = 0
+)
+print(p_alpha)
+```
+
+```{r divnet, cache=T}
+Ps_obj_filt %>% 
+  sample_richness %>%
+  plot
+
+tax_glom(Ps_obj_filt, taxrank="Order") %>%
+  sample_richness %>%
+  plot
+
+# Phylum
+Ps_obj_filt_Phylum <- tax_glom(Ps_obj_filt, taxrank="Phylum")
+set.seed(20200929)
+divnet_phylum <- Ps_obj_filt_Phylum %>%
+  divnet(ncores = 4, tuning = "careful")
+divnet_phylum %>% names
+divnet_phylum$shannon %>% head
+
+divnet_phylum$shannon %>% 
+  plot(Ps_obj_filt_Phylum, color = "Location") +
+  xlab("Sample name") +
+  ylab("Shannon diversity estimate\n(phylum level)") +
+  coord_cartesian(ylim = c(0,2))
+
+divnet_phylum_location <- Ps_obj_filt_Phylum %>%
+  divnet(X = "Location", ncores = 4)
+
+divnet_phylum_location$shannon %>% 
+  plot(Ps_obj_filt_Phylum, color = "Location") +
+  xlab("Sample name") +
+  ylab("Shannon diversity estimate\n(phylum level)") +
+  coord_cartesian(ylim = c(0,2))
+
+# Order
+Ps_obj_filt_Order <- tax_glom(Ps_obj_filt, taxrank="Order")
+divnet_order <- Ps_obj_filt_Order %>%
+  divnet(ncores = 4, tuning = "careful")
+
+divnet_order$shannon %>% 
+  plot(Ps_obj_filt_Order, color = "Location") +
+  xlab("Sample name") +
+  ylab("Shannon diversity estimate\n(phylum level)") +
+  coord_cartesian(ylim = c(0,4))
+
+divnet_order_location <- Ps_obj_filt_Order %>%
+  divnet(X = "Location", ncores = 4)
+
+divnet_order_location$shannon %>% 
+  plot(Ps_obj_filt_Order, color = "Location") +
+  xlab("Sample name") +
+  ylab("Shannon diversity estimate\n(order level)") +
+  coord_cartesian(ylim = c(0,2))
+
+# ASV
+divnet_ASV <- Ps_obj_filt %>%
+  divnet(ncores = 4, tuning = "careful")
+
+divnet_ASV$shannon %>% 
+  plot(Ps_obj_filt, color = "Location") +
+  xlab("Sample name") +
+  ylab("Shannon diversity estimate\n(phylum level)") +
+  coord_cartesian(ylim = c(0,5))
+
+divnet_location <- Ps_obj_filt %>%
+  divnet(X = "Location", ncores = 4)
+
+divnet_location$shannon %>% 
+  plot(Ps_obj_filt, color = "Location") +
+  xlab("Location characteristic") +
+  ylab("Shannon diversity estimate\n(ASV level)") +
+  coord_cartesian(ylim = c(0,5))
+
+simplifyBeta(divnet_location, Ps_obj_filt, "bray-curtis", "Location")
+
+
+simplifyBeta(divnet_location, Ps_obj_filt, "bray-curtis", "Location") %>%
+  ggplot(aes(x = interaction(Covar1, Covar2), 
+             y = beta_est,
+             col = interaction(Covar1, Covar2))) +
+  geom_point() +
+  geom_linerange(aes(ymin = lower, ymax = upper)) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  xlab("") + ylab("Estimates of Bray-Curtis distance")
+
+merge_samples(Ps_obj_filt, "Rock.type") %>%
+  sample_shannon
+
+
+# plugin <- tax_glom(Ps_obj_filt, taxrank="Order") %>% estimate_richness(measures = "Shannon") %$% Shannon
+Ps_obj_filt %>% 
+  estimate_richness(measures = "Shannon") %$% 
+  Shannon -> plugin
+Ps_obj_filt %>%
+  sample_data %$% 
+  Location ->
+  Location
+t.test(plugin[Location == "City"],
+       plugin[Location == "Slope"])
+
+
+divnet_location$shannon %>% summary %$% estimate ->
+  estimates
+ses <- sqrt(divnet_location$`shannon-variance`)
+X <- breakaway::make_design_matrix(Ps_obj_filt, "Location")
+betta(estimates, ses, X)$table
+betta(estimates, ses, X)$global[2]
+```
+
+### Beta diversity
+Calculate and plot beta diversity metrics.
+```{r ADONIS full, cache=T}
+(mod1 <-  adonis(
+  otu_table(Ps_obj_filt_GMPR) ~ Location * Rock.type,
+  data = as(sample_data(Ps_obj_filt_GMPR), "data.frame"),
+  method = "horn",
+  permutations = 9999
+))
+
+(mod2 <- adonis(
+  otu_table(Ps_obj_filt_GMPR) ~ Location,
+  data = as(sample_data(Ps_obj_filt_GMPR), "data.frame"),
+  method = "horn",
+  permutations = 9999
+))
+
+mod1_pairwise <- PairwiseAdonis(
+  otu_table(Ps_obj_filt_GMPR),
+  sample_data(Ps_obj_filt_GMPR)$Location,
+  sim.function = "vegdist",
+  sim.method = "horn",
+  p.adjust.m = "BH"
+)
+print(mod1_pairwise)
+(sig_pairs1 <- list(as.character(mod1_pairwise$pairs[mod1_pairwise$p.adjusted < 0.05])))
+
+mod2_pairwise <- PairwiseAdonis(
+  otu_table(Ps_obj_filt_GMPR),
+  sample_data(Ps_obj_filt_GMPR)$Rock.type,
+  sim.function = "vegdist",
+  sim.method = "horn",
+  p.adjust.m = "BH"
+)
+print(mod2_pairwise)
+(sig_pairs2 <- list(as.character(mod2_pairwise$pairs[mod2_pairwise$p.adjusted < 0.05])))
+
+mod3_pairwise <- PairwiseAdonis(
+  otu_table(Ps_obj_filt_GMPR),
+  sample_data(Ps_obj_filt_GMPR)$Location.rock,
+  sim.function = "vegdist",
+  sim.method = "horn",
+  p.adjust.m = "BH"
+)
+print(mod3_pairwise)
+(sig_pairs3 <- list(as.character(mod3_pairwise$pairs[mod3_pairwise$p.adjusted < 0.1])))
+```
+
+```{r ADONIS phylo, cache=T}
+Unifrac_mat <- UniFrac(Ps_obj_filt, 
+                       weighted = TRUE, 
+                       normalized = TRUE, 
+                       parallel = TRUE, 
+                       fast = TRUE)
+
+(mod1 <-  adonis(
+  Unifrac_mat ~ Location * Rock.type,
+  data = as(sample_data(Ps_obj_filt_GMPR), "data.frame"),
+  method = "horn",
+  permutations = 9999
+))
+
+(mod2 <- adonis(
+  Unifrac_mat ~ Location,
+  data = as(sample_data(Ps_obj_filt_GMPR), "data.frame"),
+  method = "horn",
+  permutations = 9999
+))
+```
+Only "Location" is significant
+
+##### Calculate ordinations
+```{r ordinate all, cache=T, fig.height=10}
+Ps_obj_ord1 <- ordinate(Ps_obj_filt_GMPR, "CAP", "horn", formula = Ps_obj_filt_GMPR ~  Location * Rock.type)
+Ps_obj_ord2 <- ordinate(Ps_obj_filt_GMPR, "CAP", "horn", formula = Ps_obj_filt_GMPR ~  Location)
+
+explained <- eigenvals(Ps_obj_ord2)/sum( eigenvals(Ps_obj_ord2)) * 100
+explained <- as.numeric(format(round(explained, 1), nsmall = 1))
+
+Ps_obj_filt_GMPR %>% 
+  plot_ordination(., Ps_obj_ord2, type = "samples", shape = "Rock.type", color = "Location", justDF = TRUE) -> #%>% 
+  # mutate_at(., "Elevation..m.", ~fct_relevel(., "Winter", "Spring", "Summer", "Autumn")) %>% 
+  # mutate_at(., "Sample.type", ~fct_relevel(., "Soil", "Green tea", "Rooibos")) %>% 
+  # dplyr::rename(., `Sample type` = Sample.type) ->
+  ord_df
+
+p_ord <- ggplot(ord_df,
+             aes(
+               x = CAP1,
+               y = MDS1,
+               shape = Rock.type,
+               color = Location
+             )) +
+  stat_ellipse(
+    aes(x = CAP1, 
+        y = MDS1, 
+        fill = Location
+        ),
+    geom = "polygon",
+    alpha = 1/4,
+    type = "t",
+    level = 0.9,
+    # linetype = 2,
+    inherit.aes = FALSE
+  ) +
+  geom_point(size = 4, alpha = 2 / 3) +
+  guides(colour = guide_legend(title = "Location"), shape = guide_legend(title = "Rock.type")) +
+  scale_colour_manual(values = Gradient.colours) +
+  scale_fill_manual(values = Gradient.colours, guide = "none") +
+  labs(x = sprintf("CAP1 (%s%%)", explained[1]), 
+       y = sprintf("CAP2 (%s%%)", explained[2])) +
+  coord_fixed(ratio = sqrt(explained[2] / explained[1])) +
+   theme(legend.justification = "top")
+  # facet_wrap(. ~ Rock.type)
+print(p_ord)
+```
+
+```{r ordinate phylo, cache=T, fig.height=10}
+Ps_obj_ord1 <- ordinate(Ps_obj_filt, "PCoA", "Unifrac", formula = Ps_obj_filt ~ Location * Rock.type)
+Ps_obj_ord2 <- ordinate(Ps_obj_filt, "PCoA", "Unifrac", formula = Ps_obj_filt ~ Location)
+
+explained <- Ps_obj_ord2$values$Relative_eig/sum(Ps_obj_ord2$values$Relative_eig) * 100
+explained <- as.numeric(format(round(explained, 1), nsmall = 1))
+
+Ps_obj_filt %>% 
+  plot_ordination(., Ps_obj_ord2, type = "samples", shape = "Rock.type", color = "Location", justDF = TRUE) -> #%>% 
+  # mutate_at(., "Elevation..m.", ~fct_relevel(., "Winter", "Spring", "Summer", "Autumn")) %>% 
+  # mutate_at(., "Sample.type", ~fct_relevel(., "Soil", "Green tea", "Rooibos")) %>% 
+  # dplyr::rename(., `Sample type` = Sample.type) ->
+  ord_df
+
+p_ord_phylo <- ggplot(ord_df,
+             aes(
+               x = Axis.1,
+               y = Axis.2,
+               shape = Rock.type,
+               color = Location
+             )) +
+  stat_ellipse(
+    aes(x = Axis.1, 
+        y = Axis.2, 
+        fill = Location
+        ),
+    geom = "polygon",
+    alpha = 1/4,
+    type = "t",
+    level = 0.9,
+    # linetype = 2,
+    inherit.aes = FALSE
+  ) +
+  geom_point(size = 4, alpha = 2 / 3) +
+  theme_bw(base_size = 14) +
+  guides(colour = guide_legend(title = "Location"), shape = guide_legend(title = "Rock.type")) +
+  scale_colour_manual(values = Gradient.colours) +
+  scale_fill_manual(values = Gradient.colours, guide = "none") +
+  labs(x = sprintf("CAP1 (%s%%)", explained[1]), 
+       y = sprintf("CAP2 (%s%%)", explained[2])) +
+  coord_fixed(ratio = sqrt(explained[2] / explained[1])) #+ 
+  # facet_wrap(. ~ Rock.type)
+print(p_ord_phylo)
+```
+
+#### Test differences between samples on the phylum level
+```{r STAMPR, fig.width=12, fig.height=6, cache=T, results="hide"}
+Taxa_tests_phylum1 <- STAMPR2(Ps_obj_filt, vars2test = "Location", threshold = 0.001 ,outputfile = paste0(Proj_name, "_Location"))
+
+pSTAMPR1 <- plotSTAMPR(Taxa_tests_phylum1, pair = "City - Slope")
+print(pSTAMPR1)
+
+Taxa_tests_phylum2 <- STAMPR2(Ps_obj_filt, vars2test = c("Location", "Rock.type"), threshold = 0.001, outputfile = paste0(Proj_name, "_Location_Rock"))
+
+pSTAMPR2 <- plotSTAMPR(Taxa_tests_phylum2, pair = "City:Chalk - Slope:Chalk")
+print(pSTAMPR2)
+```
+
+###  Let's also look at the taxonomic classification:  
+
+#### Taxa box-plot  
+Agglomerate data and tag rare taxa
+```{r agglomarate rares, cache=T}
+Ps_obj_filt_GMPR_ra <- transform_sample_counts(Ps_obj_filt_GMPR, function(x){x / sum(x)} * 100)
+
+Ps_obj_filt_GMPR_glom <- tax_glom(Ps_obj_filt_GMPR_ra, 
+                             "Phylum", 
+                             NArm = TRUE)
+Ps_obj_filt_GMPR_glom_DF <- speedyseq::psmelt(Ps_obj_filt_GMPR_glom)
+Ps_obj_filt_GMPR_glom_DF$Phylum %<>% as.character()
+# Ps_obj_filt3_glom_DF %<>% mutate(Species = fct_relevel(Species, "NA", after = Inf))
+
+# group dataframe by Phylum, calculate median rel. abundance
+Ps_obj_filt_GMPR_glom_DF %>%
+  group_by(Phylum) %>%
+  summarise(median = median(Abundance)) ->
+  medians
+
+# find Phyla whose rel. abund. is less than 1%
+Rare_phyla0.01 <- medians[medians$median <= 0.01, ]$Phylum
+
+# change their name to "Rare"
+Ps_obj_filt_GMPR_glom_DF[Ps_obj_filt_GMPR_glom_DF$Phylum %in% Rare_phyla0.01, ]$Phylum <- 'Rare'
+# re-group
+Ps_obj_filt_GMPR_glom_DF %>%
+  group_by(Sample, Phylum, Location, Rock.type, Location.rock) %>%
+  summarise(Abundance = sum(Abundance)) ->
+  Ps_obj_filt_GMPR_glom_DF_2plot
+
+# ab.taxonomy$Freq <- sqrt(ab.taxonomy$Freq)
+# Ps_obj_filt3_glom_rel_DF$Phylum %<>% sub("unclassified", "Unclassified", .)
+# Ps_obj_filt3_glom_rel_DF$Phylum %<>% sub("uncultured", "Unclassified", .)
+
+Ps_obj_filt_GMPR_glom_DF_2plot %>% 
+  group_by(Sample) %>% 
+  filter(Phylum == "Rare") %>% 
+  summarise(`Rares (%)` = sum(Abundance)) -> 
+  Rares
+```
+Summarise taxonomy
+```{r summarise taxonomy, cache=T}
+# Percentage of reads classified as rare 
+Rares %>%
+  kable(., digits = c(2), caption = "Percentage of reads per sample classified as rare:") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = F)
+
+sample_order <- match(Rares$Sample, row.names(sample_data(Ps_obj_filt_GMPR_glom)))
+Rares %<>% arrange(., sample_order)
+
+Rares %>% 
+  cbind(., sample_data(Ps_obj_filt_GMPR_glom)) %>% 
+  group_by(Location.rock) %>% 
+  setNames(make.names(names(.), unique = TRUE)) %>% # fails for some reason without it
+  summarise(`Rares (%)` = mean(`Rares....`)) -> 
+  Rares_merged
+
+# Percentage of reads classified as rare 
+Rares_merged %>%
+  kable(., digits = c(2), caption = "Percentage of reads per sample classified as rare:") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = F)
+```
+
+```{r taoxonomy_boxplot, cache=T}
+Ps_obj_filt_GMPR_glom_DF_2plot %>% 
+  group_by(Phylum) %>% 
+  summarise(sum.Taxa = sum(Abundance)) %>% 
+  arrange(desc(sum.Taxa)) -> Taxa_rank
+Ps_obj_filt_GMPR_glom_DF_2plot$Phylum %<>% 
+  factor(., levels = Taxa_rank$Phylum) %>% 
+  fct_relevel(., "Rare", after = Inf)
+  
+p_taxa_box <-
+  ggplot(Ps_obj_filt_GMPR_glom_DF_2plot, aes(x = Phylum, y = (Abundance))) +
+  geom_boxplot(aes(group = interaction(Phylum, Location)), position = position_dodge(width = 0.9), fatten = 1) +
+  geom_point(
+    aes(colour = Rock.type),
+    position = position_jitterdodge(dodge.width = 1),
+    alpha = 1 / 2,
+    stroke = 0,
+    size = 2
+  ) +
+  scale_colour_manual(values = Gradient.colours, name = "") +
+  theme_bw()+
+  # theme_cowplot(font_size = 11, font_family = f_name) +
+  labs(x = NULL, y = "Relative abundance (%)") +
+  guides(colour = guide_legend(override.aes = list(size = 5))) +
+  facet_grid(Location ~ .) +
+  background_grid(major = "xy",
+                  minor = "none") +
+  theme(axis.text.x = element_text(
+    angle = 45,
+    vjust = 0.9,
+    hjust = 0.9
+  ),
+  legend.position = c(.99, .99),
+  legend.justification = c("right", "top"),
+  legend.box.just = "top",
+  legend.margin = margin(0, 3, 3, 3))
+print(p_taxa_box)
+```
+
+### Differential abundance models
+Detect differentially abundant ASVs using ALDEx2 [@fernandes_anova-like_2013]
+
+Tag rare phyla (for plotting purposes only)
+```{r tag rare phyla, cache=T}
+Ps_obj_filt_GMPR_glom <- tax_glom(Ps_obj_filt_GMPR, 
+                             "Phylum", 
+                             NArm = TRUE) # glomerate to the phylum level
+Ps_obj_filt_GMPR_glom_rel <- transform_sample_counts(Ps_obj_filt_GMPR_glom, function(x) x / sum(x)) # transform to rel. ab.
+Ps_obj_filt_GMPR_glom_rel_DF <- speedyseq::psmelt(Ps_obj_filt_GMPR_glom_rel) # generate a df
+Ps_obj_filt_GMPR_glom_rel_DF$Phylum %<>% as.character() # factor to char
+
+# group dataframe by Phylum, calculate median rel. abundance
+Ps_obj_filt_GMPR_glom_rel_DF %>%
+  group_by(Phylum) %>%
+  summarise(median = median(Abundance)) ->
+  medians
+
+# find Phyla whose median rel. abund. is less than 0.5%
+Rare_phyla0.005 <- medians[medians$median <= 0.005, ]$Phylum
+
+# change their name to "Rare"
+Ps_obj_filt_GMPR_glom_rel_DF[Ps_obj_filt_GMPR_glom_rel_DF$Phylum %in% Rare_phyla0.005, ]$Phylum <- 'Rare'
+
+# re-group
+Ps_obj_filt_GMPR_glom_rel_DF %>%
+  group_by(Phylum) %>%
+  summarise(Abundance = sum(Abundance)) %>% 
+  arrange(desc(Abundance)) -> Taxa_rank
+```
+
+**Sample type differences**
+```{r ALDEx2 - zone, cache=T, results = 'asis', fig.width=10, fig.height=8}
+significance = 0.1
+ALDEx_comparisons <- list()
+ALDEx_comparisons$Comparisons <- sig_pairs1[[1]]
+
+# Ps_obj_filt_median_subset <- prune_taxa(names(sort(taxa_sums(Ps_obj_filt_median), TRUE)[1:100]), Ps_obj_filt_median)
+
+for (j in seq(1, length(ALDEx_comparisons$Comparisons))) {
+  # print(j)
+  ALDEx_comparisons$Comparisons[j] %>% 
+    str_split(., " - ", simplify = FALSE) %>% 
+    unlist() ->
+    comparison_string
+Ps_obj_filt %>%
+    subset_samples(Location %in% c(comparison_string[1], comparison_string[2])) ->
+  # tax_glom("Order") ->
+  Ps_obj_filt_pairwise
+
+#  Remove species with prevalence < 10%
+  Ps_obj_filt_pairwise_s <- DropRareSpecies(Ps_obj = Ps_obj_filt_pairwise, prevalence = 0.6)
+    
+  sample_data(Ps_obj_filt_pairwise_s)$Location %<>% fct_relevel(., str_split(ALDEx_comparisons$Comparisons[j], " - ", simplify = TRUE)[1])
+  
+  # make Joint.sample.name for matching OTUs between compared samples (for GGPlotTopOTUs)
+  suppressWarnings(
+  sample_data(Ps_obj_filt_pairwise_s) %<>%
+    as(., "data.frame") %>% 
+    rownames_to_column() %>% 
+    mutate_if(is.factor, as.character) %>% 
+    mutate(Joint.sample.name  = paste0(.$Location, "_", .$Rock.type, "_", .$Replicate)) %>% 
+    mutate_at("Joint.sample.name", ~str_replace_all(., paste0(unique(comparison_string), collapse = "|"), "")) %>% # remove the levels participating in the comparison from the names
+    mutate_at("Joint.sample.name", ~str_replace_all(., "^_", "")) %>% # remove first "_"
+    column_to_rownames()
+  )
+    
+  ALDEx2plot_pairwise <- CalcALDEx(
+    physeq_obj = Ps_obj_filt_pairwise_s,
+    vars2test = "Location",
+    rare_phyla = Rare_phyla0.005
+  )
+    ALDEx2plot_pairwise <- PrepALDExData(ALDEx2plot_pairwise$ALDEx_tt, ALDEx2plot_pairwise$ALDEx_effect, physeq_obj = Ps_obj_filt_pairwise_s, sig_level = significance, LFC = 0, Taxa_rank, rare_phyla = Rare_phyla0.005)
+    
+  ALDEx_comparisons$Results[[j]] <- ALDEx2plot_pairwise # store results
+  ALDEx_comparisons$Results[[j]]$Var1 <- str_split(ALDEx_comparisons$Comparisons[j], " vs ", simplify = TRUE)[1]
+  ALDEx_comparisons$Results[[j]]$Var2 <- str_split(ALDEx_comparisons$Comparisons[j], " vs ", simplify = TRUE)[2]
+  ALDEX_summary <- tibble(Label = c(paste0("⬆", sum( ALDEx_comparisons$Results[[j]]$effect > 0 &  ALDEx_comparisons$Results[[j]]$Significance == "Pass"), " ⬇", sum( ALDEx_comparisons$Results[[j]]$effect < 0 &  ALDEx_comparisons$Results[[j]]$Significance == "Pass"), " (", nrow( ALDEx_comparisons$Results[[j]]), ")")))
+  
+  ALDEx2plot_pairwise %>%
+    filter(Significance == "Pass") %>%
+    dplyr::select(OTU, baseMean, effect, Phylum, Class, Order, Family, Genus) %>%
+    arrange(desc(abs(effect))) ->
+    ALDEx2plot_pairwise_results
+    
+  # print(ALDEx2plot_pairwise_results %>% 
+  #   kable(., digits = c(2), caption = "Significantly different taxa:") %>%
+  #   kable_styling(
+  #     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+  #     full_width = F
+  #   ))
+  
+  write.csv(ALDEx2plot_pairwise_results, file = paste0("ALDEX_", comparison_string[1], "_vs_", comparison_string[2], ".csv"))
+  
+  # Plot ALDEX plot
+  p_aldex_1 <- GGPlotALDExTax(ALDEx2plot_pairwise, OTU_labels = TRUE, sig_level = significance) +
+    # ggtitle(ALDEx_comparisons$Comparisons[j]) +
+    geom_text(
+      data    = ALDEX_summary,
+      mapping = aes(x = Inf, y = Inf, label = Label),
+      hjust   = 1.1,
+      vjust   = 1.6
+    ) +
+    scale_size_continuous(name = "Mean abundance (%)",
+                          limits = c(min(ALDEx2plot_pairwise$baseMean), max(ALDEx2plot_pairwise$baseMean))
+    ) + 
+    labs(title = ALDEx_comparisons$Comparisons[j])
+  print(p_aldex_1)
+
+  # Plot OTU plots
+  # GGPlotOTU(Ps_obj_filt_subset_pairwise_s, vars2test = "Spill.Treatment", "Seq_8")
+  # p_aldex_2 <- GGPlotTopOTUs(
+  #   physeq_obj = ALDEx2plot_pairwise,
+  #   vars2test = "Vegetation",
+  #   ALDEx_obj = ALDEx2plot_pairwise,
+  #   rank_by = "effect",
+  #   Ntop = 12, 
+  #   Connect = FALSE
+  # )
+  # print(p_aldex_2)
+
+}
+# 
+# filter(ALDEx_comparisons$Results[[1]], Significance == "Pass")$OTU[common_taxa <- filter(ALDEx_comparisons$Results[[1]], Significance == "Pass")$OTU %in% filter(ALDEx_comparisons$Results[[2]], Significance == "Pass")$OTU]
+```
+ALDEx2 did not detect any ASV as differentially abundant, but ALDEx2 is also very conservative.
+Let's try modelling differential abundance using corncob [@martin_modeling_2020], which is 
+
+```{r corncob - location, cache=T}
+comparison_string <- c("City", "Slope")
+
+Ps_obj_filt %>%
+  subset_samples(Location %in% c(comparison_string[1], comparison_string[2])) %>%
+  tax_glom("Order") ->
+  Ps_obj_filt_pairwise_glom
+
+# Test differential abundance for location
+da_Loc <- differentialTest(formula = ~ Location,
+                           phi.formula = ~ Location,
+                           formula_null = ~ 1,
+                           phi.formula_null = ~ Location, 
+                           test = "Wald", boot = FALSE,
+                           data = Ps_obj_filt,
+                           fdr_cutoff = 0.05,
+                           full_output = TRUE)
+da_Loc_intervals <- plot(da_Loc, level = "Class", data_only = T)
+which(is.na(da_Loc$p)) %>% names
+
+Ps_obj_filt %>%
+  transform_sample_counts(., function(x) x / sum(x) * 100) %>% 
+  taxa_sums(.) %>% 
+  map_dbl(~(.x / nsamples(Ps_obj_filt))) %>% 
+  enframe(name = "OTU", value = "Mean abundance (%)") -> 
+  baseMean
+
+map(da_Loc$all_models,15) %>% 
+  map(.,2) %>% 
+  unlist %>%  # grab all mu.LocationSlope Estimates (differences in estimated population relative abundance)
+  bind_cols(OTU = taxa_names(Ps_obj_filt), 
+            tax_table(Ps_obj_filt), 
+            `Differential abundance` = .,
+            Significance = fct_recode(as_factor(taxa_names(Ps_obj_filt) %in% da_Loc$significant_taxa), Pass = "TRUE", Fail = "FALSE"),
+            ymin = as.numeric(NA),
+            ymax = as.numeric(NA)
+            ) %>%
+  left_join(., baseMean, by = "OTU") ->
+  da_Loc_df
+
+da_Loc_df %<>% rows_update(., tibble(ymin = da_Loc_intervals$xmin, OTU = da_Loc$significant_taxa), by = "OTU")
+da_Loc_df %<>% rows_update(., tibble(ymax = da_Loc_intervals$xmax, OTU = da_Loc$significant_taxa), by = "OTU")
+da_Loc_df[da_Loc_df$Phylum %in% Rare_phyla0.005, "Phylum"] <- 'Rare' # rare_phyla is
+
+p_corncob_loc <- GGPlotCorncob(da_Loc_df, OTU_labels = FALSE, Taxa = "Phylum", Y_val = "Differential abundance", sig_level = 0.05, Rank = Taxa_rank)
+
+corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Loc_df$`Differential abundance` > 0 &  da_Loc_df$Significance == "Pass"), " ⬇", sum(da_Loc_df$`Differential abundance` < 0 &  da_Loc_df$Significance == "Pass"), " (", nrow(da_Loc_df), ")")))
+
+p_corncob_loc <- p_corncob_loc +
+  geom_text(
+    data    = corncob_summary,
+    mapping = aes(x = Inf, y = Inf, label = Label),
+    hjust   = 1.1,
+    vjust   = 1.6
+  ) +
+  scale_size_continuous(name = "Mean abundance (%)",
+                        limits = c(min(da_Loc_df$`Mean abundance (%)`), max(da_Loc_df$`Mean abundance (%)`))
+  ) + 
+  labs(title = paste(comparison_string, collapse = " - ")) +
+  coord_cartesian(ylim = c(-15, 15))
+print(p_corncob_loc)
+```
+
+Modelling differential abundance and variance between locations discovered `length(da_Loc$significant_taxa)` 
+
+```{r corncob - rock, cache=T}
+comparison_string <- c("Limestone", "Chalk")
+# Test differential abundance and variance for rock type
+da_Rock <- differentialTest(formula = ~ Rock.type,
+                                 phi.formula = ~ Rock.type,
+                                 formula_null = ~ 1,
+                                 phi.formula_null = ~ Rock.type, 
+                                 test = "Wald", boot = FALSE,
+                                 data = Ps_obj_filt,
+                                 fdr_cutoff = 0.05,
+                                full_output = TRUE)
+da_Rock_intervals <- plot(da_Rock, level = "Class", data_only = TRUE)
+which(is.na(da_Rock$p)) %>% names
+map(da_Rock$all_models,15) %>% 
+  map(.,2) %>% 
+  unlist %>%  # grab all mu.LocationSlope Estimates (differences in estimated population relative abundance)
+  bind_cols(OTU = taxa_names(Ps_obj_filt), 
+            tax_table(Ps_obj_filt), 
+            `Differential abundance` = .,
+            Significance = fct_recode(as_factor(taxa_names(Ps_obj_filt) %in% da_Rock$significant_taxa), Pass = "TRUE", Fail = "FALSE"),
+            ymin = as.numeric(NA),
+            ymax = as.numeric(NA)
+            ) %>%
+  left_join(., baseMean, by = "OTU") ->
+  da_Rock_df
+
+da_Rock_df %<>% rows_update(., tibble(ymin = da_Rock_intervals$xmin, OTU = da_Rock$significant_taxa), by = "OTU")
+da_Rock_df %<>% rows_update(., tibble(ymax = da_Rock_intervals$xmax, OTU = da_Rock$significant_taxa), by = "OTU")
+da_Rock_df[da_Rock_df$Phylum %in% Rare_phyla0.005, "Phylum"] <- 'Rare' # rare_phyla is
+
+p_corncob_rock <- GGPlotCorncob(da_Rock_df, OTU_labels = FALSE, Taxa = "Phylum", Y_val = "Differential abundance", sig_level = 0.05, Rank = Taxa_rank)
+
+corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Rock_df$`Differential abundance` > 0 &  da_Rock_df$Significance == "Pass"), " ⬇", sum(da_Rock_df$`Differential abundance` < 0 &  da_Rock_df$Significance == "Pass"), " (", nrow(da_Rock_df), ")")))
+
+p_corncob_rock <- p_corncob_rock +
+  geom_text(
+    data    = corncob_summary,
+    mapping = aes(x = Inf, y = Inf, label = Label),
+    hjust   = 1.1,
+    vjust   = 1.6
+  ) +
+  scale_size_continuous(name = "Mean abundance (%)",
+                        limits = c(min(da_Rock_df$`Mean abundance (%)`), max(da_Rock_df$`Mean abundance (%)`))
+  ) + 
+  labs(title = paste(comparison_string, collapse = " - ")) +
+  coord_cartesian(ylim = c(-15, 15))
+print(p_corncob_rock)
+```
+
+Modelling differential abundance and variance between rock types discovered `length(da_Rock$significant_taxa)` 
+
+```{r corncob - loc exl. rock, cache=T}
+# Test differential abundance for location, control for Rock.type for both cases
+comparison_string <- c("City", "Slope")
+da_Loc_exRock <- differentialTest(formula = ~ Location + Rock.type,
+                                 phi.formula = ~ Location + Rock.type,
+                                 formula_null = ~ Rock.type,
+                                 phi.formula_null = ~ Location + Rock.type, 
+                                 test = "Wald", boot = FALSE,
+                                 data = Ps_obj_filt,
+                                 fdr_cutoff = 0.05,
+                                full_output = TRUE)
+da_Loc_exRock_intervals <- plot(da_Loc_exRock, level = "Class", data_only = TRUE)
+
+which(is.na(da_Loc_exRock$p)) %>% names
+map(da_Loc_exRock$all_models,15) %>% 
+  map(.,2) %>% 
+  unlist %>%  # grab all mu.LocationSlope Estimates (differences in estimated population relative abundance)
+  bind_cols(OTU = taxa_names(Ps_obj_filt), 
+            tax_table(Ps_obj_filt), 
+            `Differential abundance` = .,
+            Significance = fct_recode(as_factor(taxa_names(Ps_obj_filt) %in% da_Loc_exRock$significant_taxa), Pass = "TRUE", Fail = "FALSE"),
+            ymin = as.numeric(NA),
+            ymax = as.numeric(NA)
+            ) %>%
+  left_join(., baseMean, by = "OTU") ->
+  da_Loc_exRock_df
+
+da_Loc_exRock_df %<>% rows_update(., tibble(ymin = da_Loc_exRock_intervals$xmin, OTU = da_Loc_exRock$significant_taxa), by = "OTU")
+da_Loc_exRock_df %<>% rows_update(., tibble(ymax = da_Loc_exRock_intervals$xmax, OTU = da_Loc_exRock$significant_taxa), by = "OTU")
+da_Loc_exRock_df[da_Loc_exRock_df$Phylum %in% Rare_phyla0.005, "Phylum"] <- 'Rare' # rare_phyla is
+
+p_corncob_locExroc <- GGPlotCorncob(da_Loc_exRock_df, OTU_labels = FALSE, Taxa = "Phylum", Y_val = "Differential abundance", sig_level = 0.05, Rank = Taxa_rank)
+
+corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Loc_exRock_df$`Differential abundance` > 0 &  da_Loc_exRock_df$Significance == "Pass"), " ⬇", sum(da_Loc_exRock_df$`Differential abundance` < 0 &  da_Loc_exRock_df$Significance == "Pass"), " (", nrow(da_Loc_exRock_df), ")")))
+
+p_corncob_locExroc <- p_corncob_locExroc +
+  geom_text(
+    data    = corncob_summary,
+    mapping = aes(x = Inf, y = Inf, label = Label),
+    hjust   = 1.1,
+    vjust   = 1.6
+  ) +
+  scale_size_continuous(name = "Mean abundance (%)",
+                        limits = c(min(da_Loc_exRock_df$`Mean abundance (%)`), max(da_Loc_exRock_df$`Mean abundance (%)`))
+  ) + 
+  labs(title = paste(comparison_string, collapse = " - ")) +
+  coord_cartesian(ylim = c(-15, 15))
+print(p_corncob_locExroc)
+```
+
+Modelling differential abundance between locations, while controlling for rock type discovered `length(da_Loc_exRock$significant_taxa)`
+
+```{r plot OTU 260,  cache=T}
+mod260 <- bbdml(formula = OTU260 ~ 1,
+             phi.formula = ~ 1,
+             data = Ps_obj_filt)
+mod260_Loc <- bbdml(formula = OTU260 ~ Location,
+             phi.formula = ~ Location,
+             data = Ps_obj_filt)
+mod260_Loc_rock <- bbdml(formula = OTU97 ~ Location*Rock.type,
+             phi.formula = ~ Location*Rock.type,
+             data = Ps_obj_filt)
+lrtest(mod_null = mod260, mod = mod260_Loc)
+# lrtest(mod_null = mod260_Loc, mod = mod260_Loc_rock)
+summary(mod260_Loc)
+
+plot(mod260_Loc, color = "Location", shape = "Rock.type") # add total = TRUE for total counts (i.e. not relative abundance)
+```
+
+### Compose figures
+```{r Figures}
+composite_plot <- ((p_alpha + p_taxa_box +  plot_layout(widths = c(1, 2))) /(p_ord + pSTAMPR1) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)))
+
+plot_file <- "Microbiome_1"
+svglite(paste0(plot_file, ".svg"), 
+        width = 14, 
+        height = 10.5)
+print(composite_plot)
+dev.off()
+
+ggsave(
+  paste0(plot_file, ".png"),
+  composite_plot,
+  device = agg_png,
+  width = 14, 
+  height = 10.5, 
+  units = "cm", 
+  res = 900,
+  scaling = 0.38
+)
+gz(paste0(plot_file, ".svg"), paste0(plot_file, ".svgz"))
+
+# composite_plot + plot_annotation(
+#   title = 'The surprising truth about mtcars',
+#   subtitle = 'These 3 plots will reveal yet-untold secrets about our beloved data-set',
+#   caption = 'Disclaimer: None of these plots are insightful'
+# )
+knitr::include_graphics(paste0(plot_file, ".png"))
+
+plot_file <- "Microbiome_2"
+svglite(paste0(plot_file, ".svg"), 
+        width = 12, 
+        height = 10)
+print(p_corncob_locExroc)
+dev.off()
+
+ggsave(
+  paste0(plot_file, ".png"),
+  p_corncob_locExroc,
+  device = agg_png,
+  width = 12, 
+  height = 10, 
+  units = "cm", 
+  res = 900,
+  scaling = 0.38
+)
+gz(paste0(plot_file, ".svg"), paste0(plot_file, ".svgz"))
+```
+
+### References
