@@ -5,19 +5,14 @@ subtitle: "Microbial community analysis"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 bibliography: references.bib
 link-citations: yes
-csl: fems-microbiology-ecology.csl
+always_allow_html: true
 output:
-  rmarkdown::html_document:
+  rmarkdown::github_document:
     toc: true
-    toc_float: true
     toc_depth: 5
-    keep_md: false
-    number_sections: false
-    highlight: "pygments"
-    theme: "flatly"
     df_print: "kable"
-    fig_caption: true
-    code_folding: "show"
+    keep_html: TRUE
+    
 ---
 
 ```{r libraries, include=F}
@@ -57,8 +52,8 @@ knitr::opts_chunk$set(
   dpi = 300,
 #  fig.width = 12,
 #  fig.height = 8,
-  cache.path = "Shivta_cache/",
-  fig.path = "Shivta_figures/"
+  cache.path = "BRC_growth_rate_cache/",
+  fig.path = "BRC_growth_rate_figures/"
 )
 f_name <- "DejaVu Sans" #sub("\\s//", "", f_name)
 f_size <- 12
@@ -646,8 +641,8 @@ STAMPR2 <- function(physeq_obj,
     #   # we use this and not BH because of dependency in the tests (compositional data)
     # }
     # 
-    write.csv(taxa_test_results, file = paste0(outputfile, "_", tax_rank, "_Pvals.csv"))
-    write.csv(taxa_test_estimates, file = paste0(outputfile, "_", tax_rank, "_CI.csv"))
+    write.csv(taxa_test_results, file = paste0("./Results/", outputfile, "_", tax_rank, "_Pvals.csv"))
+    write.csv(taxa_test_estimates, file = paste0("./Results/", outputfile, "_", tax_rank, "_CI.csv"))
     Taxa_tests <- list(taxa_test_results, taxa_test_estimates)
     return(Taxa_tests)
   }
@@ -1153,8 +1148,8 @@ This script reproduces all sequence analysis steps and plots included in the pap
 ### Load data
 ```{r load data, cache=TRUE}
 OTUmat <- t(read.csv(paste0(data_path, "Shivta_site_otuTab2.txt"), header = TRUE, row.names = 1))
-sort.order <- as.numeric( gsub( "OTU([0-9]+)", "\\1", colnames( OTUmat ) ) )
-OTUmat <- OTUmat[, order( sort.order )]
+sort.order <- as.numeric(gsub("OTU([0-9]+)", "\\1", colnames( OTUmat )))
+OTUmat <- OTUmat[, order(sort.order )]
 
 Metadata <- read.csv(paste0(data_path, "Shivta_metadata.csv"), row.names = 1, header = TRUE)
 
@@ -1223,7 +1218,7 @@ Ps_obj_filt <- subset_taxa(Ps_obj, !is.na(Phylum) &
                       !Family %in% families2remove)
 ```
 
-### Inspect library size and number of ASV
+### Inspect library size and number of OTU
 ```{r Library Sizes, cache=T}
 Ps_obj_df <-
   as.data.frame(sample_data(Ps_obj_filt)) # Put sample_data into a ggplot-friendly data.frame
@@ -1417,8 +1412,8 @@ for (i in c(1, seq(2, length(rich.ests), 2))) {
   Richness <- cbind(Richness, S, se)
 }
 colnames(Richness) <- c("S.obs", "S.obs.se", "S.chao1", "S.chao1.se", "S.ACE", "S.ACE.se")
-saveRDS(Richness, file = paste0("./", Proj_name))
-write.csv(Richness, file = paste0("./", Proj_name))
+saveRDS(Richness, file = paste0("./Results/", Proj_name, "_richness.RDS"))
+write.csv(Richness, file = paste0("./Results/", Proj_name, "_richness.csv"))
 ses <- grep("\\.se", colnames(Richness))
 Richness[, ses] %>% 
   gather(key = "est.se") -> se.dat
@@ -1443,8 +1438,8 @@ colnames(Diversity) <- c("Shannon", "Shannon.se", "Inv.simpson", "Inv.simpson.se
 ses <- grep("\\.se", colnames(Diversity))
 Diversity[, ses] %>% gather(key = "est.se") -> se.dat
 Diversity[, -unique(ses)] %>% gather(key = "est") -> mean.dat
-saveRDS(Diversity, file = paste0("./", Proj_name))
-write.csv(Diversity, file = paste0("./", Proj_name))
+saveRDS(Diversity, file = paste0("./Results/", Proj_name, "_diversity.RDS"))
+write.csv(Diversity, file = paste0("./Results/", Proj_name, "_diversity.csv"))
 ```
 
 #### Test the differences in alpha diversity.
@@ -1726,7 +1721,7 @@ Unifrac_mat <- UniFrac(Ps_obj_filt,
   permutations = 9999
 ))
 ```
-The difference between city and slope is significant based on the Morisita-Horn distances between ASV but
+The difference between city and slope is significant based on the Morisita-Horn distances between OTUs but not based on UniFrac.
 
 ##### Calculate ordinations
 ```{r ordinate all, cache=T, fig.height=10}
@@ -1957,7 +1952,7 @@ Ps_obj_filt_GMPR_glom_rel_DF %>%
   arrange(desc(Abundance)) -> Taxa_rank
 ```
 
-Detect differentially abundant ASVs using corncob [@martin_modeling_2020]
+Detect differentially abundant OTUs using corncob [@martin_modeling_2020]
 ```{r corncob - location, cache=T}
 comparison_string <- c("City", "Slope")
 
@@ -2147,7 +2142,7 @@ plot(mod260_Loc, color = "Location", shape = "Rock.type") # add total = TRUE for
 ```{r Figures}
 composite_plot <- ((p_alpha + p_taxa_box +  plot_layout(widths = c(1, 2))) /(p_ord + pSTAMPR1) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)))
 
-plot_file <- "Microbiome_1"
+plot_file <- "./Results/Microbiome_1"
 svglite(paste0(plot_file, ".svg"), 
         width = 14, 
         height = 10.5)
@@ -2167,7 +2162,7 @@ ggsave(
 gz(paste0(plot_file, ".svg"), paste0(plot_file, ".svgz"))
 knitr::include_graphics(paste0(plot_file, ".png"))
 
-plot_file <- "Microbiome_2"
+plot_file <- "./Results/Microbiome_2"
 svglite(paste0(plot_file, ".svg"), 
         width = 12, 
         height = 10)
