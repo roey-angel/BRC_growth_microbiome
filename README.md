@@ -2,7 +2,6 @@ How fast do biological rock crust grow?
 ========
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.com/RoeyAngel)   ![license](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square)
-[![DOI](https://zenodo.org/badge/140607356.svg)](https://zenodo.org/badge/latestdoi/140607356)
 
 
 Data, sequence analysis ploting for the microbiome figures included in the paper: [Nimrod Wieler, Tali Erickson Gini, Roey Angel and Osnat Gillor: THow fast do biological rock crust grow?
