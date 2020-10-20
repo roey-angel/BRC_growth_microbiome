@@ -1,6 +1,6 @@
 How fast does biological rock crust grow?
 ================
-17 October, 2020
+20 October, 2020
 
   - [Setting general parameters:](#setting-general-parameters)
   - [Description](#description)
@@ -119,7 +119,7 @@ sample_data(Ps_obj)$Location %<>% fct_relevel("Slope", "City")
 Remove un- and mis-classified sequences, chloroplasts and mitochondria
 
 ``` r
-domains2remove <- c("", "Eukaryota", "Unclassified")
+domains2remove <- c("", "Archaea", "Eukaryota", "Unclassified")
 classes2remove <- c("Chloroplast")
 families2remove <- c("Mitochondria")
 Ps_obj_filt <- subset_taxa(Ps_obj, !is.na(Phylum) &
@@ -148,14 +148,14 @@ summary(sample_sums(Ps_obj_filt))
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##   23972   44989   54329   53254   61352   77463
+    ##   23966   44989   53000   52663   61348   77459
 
 ``` r
 summary(taxa_sums(Ps_obj_filt))
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##       3      70     191    1814     769   76180
+    ##       3      70     198    1852     771   76180
 
 ### Explore the prevalence of different taxa in the database
 
@@ -467,28 +467,6 @@ Deinococcus-Thermus
 <td style="text-align:right;">
 
 174
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Euryarchaeota
-
-</td>
-
-<td style="text-align:right;">
-
-3.9
-
-</td>
-
-<td style="text-align:right;">
-
-90
 
 </td>
 
@@ -1415,28 +1393,6 @@ Gemmatimonadales
 <td style="text-align:right;">
 
 214
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-Halobacteriales
-
-</td>
-
-<td style="text-align:right;">
-
-3.9
-
-</td>
-
-<td style="text-align:right;">
-
-90
 
 </td>
 
@@ -2484,10 +2440,10 @@ print(Ps_obj_filt)
 ```
 
     ## phyloseq-class experiment-level object
-    ## otu_table()   OTU Table:         [ 732 taxa and 25 samples ]
+    ## otu_table()   OTU Table:         [ 709 taxa and 25 samples ]
     ## sample_data() Sample Data:       [ 25 samples by 6 sample variables ]
-    ## tax_table()   Taxonomy Table:    [ 732 taxa by 6 taxonomic ranks ]
-    ## phy_tree()    Phylogenetic Tree: [ 732 tips and 730 internal nodes ]
+    ## tax_table()   Taxonomy Table:    [ 709 taxa by 6 taxonomic ranks ]
+    ## phy_tree()    Phylogenetic Tree: [ 709 tips and 707 internal nodes ]
     ## taxa are columns
 
 #### Plot general prevalence features of the phyla
@@ -2566,13 +2522,13 @@ print(Ps_obj_filt)
 ```
 
     ## phyloseq-class experiment-level object
-    ## otu_table()   OTU Table:         [ 711 taxa and 25 samples ]
+    ## otu_table()   OTU Table:         [ 694 taxa and 25 samples ]
     ## sample_data() Sample Data:       [ 25 samples by 6 sample variables ]
-    ## tax_table()   Taxonomy Table:    [ 711 taxa by 6 taxonomic ranks ]
-    ## phy_tree()    Phylogenetic Tree: [ 711 tips and 709 internal nodes ]
+    ## tax_table()   Taxonomy Table:    [ 694 taxa by 6 taxonomic ranks ]
+    ## phy_tree()    Phylogenetic Tree: [ 694 tips and 692 internal nodes ]
     ## taxa are columns
 
-This removed 56 or 7% of the sequences.
+This removed 73 or 10% of the sequences.
 
 ### Exploring the dataset features
 
@@ -2643,7 +2599,7 @@ City Chalk 3
 
 <td style="text-align:right;">
 
-54157
+54155
 
 </td>
 
@@ -2691,7 +2647,7 @@ City Chalk 6
 
 <td style="text-align:right;">
 
-77463
+77459
 
 </td>
 
@@ -2739,7 +2695,7 @@ City Limestone 3
 
 <td style="text-align:right;">
 
-56370
+48378
 
 </td>
 
@@ -2755,7 +2711,7 @@ City Limestone 4
 
 <td style="text-align:right;">
 
-53092
+47108
 
 </td>
 
@@ -2771,7 +2727,7 @@ City Limestone 5
 
 <td style="text-align:right;">
 
-61350
+61346
 
 </td>
 
@@ -2787,7 +2743,7 @@ City Limestone 6
 
 <td style="text-align:right;">
 
-54508
+54505
 
 </td>
 
@@ -2803,7 +2759,7 @@ Slope Limestone 1
 
 <td style="text-align:right;">
 
-75580
+75578
 
 </td>
 
@@ -2819,7 +2775,7 @@ Slope Chalk 1
 
 <td style="text-align:right;">
 
-51652
+51651
 
 </td>
 
@@ -2835,7 +2791,7 @@ Slope Chalk 2
 
 <td style="text-align:right;">
 
-45201
+45197
 
 </td>
 
@@ -2851,7 +2807,7 @@ Slope Chalk 3
 
 <td style="text-align:right;">
 
-33632
+33625
 
 </td>
 
@@ -2867,7 +2823,7 @@ Slope Chalk 4
 
 <td style="text-align:right;">
 
-70890
+70886
 
 </td>
 
@@ -2883,7 +2839,7 @@ Slope Chalk 5
 
 <td style="text-align:right;">
 
-71460
+71458
 
 </td>
 
@@ -2899,7 +2855,7 @@ Slope Chalk 6
 
 <td style="text-align:right;">
 
-58961
+58959
 
 </td>
 
@@ -2915,7 +2871,7 @@ Slope Chalk 7
 
 <td style="text-align:right;">
 
-36759
+36756
 
 </td>
 
@@ -2931,7 +2887,7 @@ City Chalk 1
 
 <td style="text-align:right;">
 
-23968
+23962
 
 </td>
 
@@ -2947,7 +2903,7 @@ Slope Limestone 2
 
 <td style="text-align:right;">
 
-62460
+62456
 
 </td>
 
@@ -2963,7 +2919,7 @@ Slope Limestone 3
 
 <td style="text-align:right;">
 
-36635
+36628
 
 </td>
 
@@ -2979,7 +2935,7 @@ Slope Limestone 4
 
 <td style="text-align:right;">
 
-57291
+57283
 
 </td>
 
@@ -2995,7 +2951,7 @@ Slope Limestone 5
 
 <td style="text-align:right;">
 
-64511
+64509
 
 </td>
 
@@ -3011,7 +2967,7 @@ Slope Limestone 6
 
 <td style="text-align:right;">
 
-41565
+41564
 
 </td>
 
@@ -3043,9 +2999,9 @@ reads per samples.
     ## Terms added sequentially (first to last)
     ## 
     ##              Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)
-    ## Library.size  1    0.4358 0.43579  1.3712 0.05626 0.2005
-    ## Residuals    23    7.3095 0.31781         0.94374       
-    ## Total        24    7.7453                 1.00000
+    ## Library.size  1    0.4246 0.42456  1.3337 0.05481 0.2192
+    ## Residuals    23    7.3218 0.31834         0.94519       
+    ## Total        24    7.7464                 1.00000
 
 ``` r
 PlotReadHist(as(otu_table(Ps_obj_filt), "matrix"))
@@ -3105,9 +3061,9 @@ adonis(
     ## Terms added sequentially (first to last)
     ## 
     ##              Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)
-    ## Library.size  1    0.4358 0.43579  1.3712 0.05626 0.2068
-    ## Residuals    23    7.3095 0.31781         0.94374       
-    ## Total        24    7.7453                 1.00000
+    ## Library.size  1    0.4246 0.42456  1.3337 0.05481  0.228
+    ## Residuals    23    7.3218 0.31834         0.94519       
+    ## Total        24    7.7464                 1.00000
 
 ``` r
 PlotLibDist(Ps_obj_filt_GMPR)
@@ -3229,7 +3185,7 @@ data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.",
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares        65       705               9787     62082
+    ## Sum of Squares        68       647              10123     62200
     ## Deg. of Freedom        1         1                  1        21
     ## 
     ## Residual standard error: 54.4
@@ -3242,34 +3198,34 @@ data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.",
     ## 
     ## Response: Estimate
     ##                    Sum Sq Df F value  Pr(>F)    
-    ## (Intercept)        594952  1  201.25 3.1e-12 ***
-    ## Location             3860  1    1.31   0.266    
-    ## Rock.type            7702  1    2.61   0.121    
-    ## Location:Rock.type   9787  1    3.31   0.083 .  
-    ## Residuals           62082 21                    
+    ## (Intercept)        588166  1  198.58 3.6e-12 ***
+    ## Location             3993  1    1.35   0.259    
+    ## Rock.type            7767  1    2.62   0.120    
+    ## Location:Rock.type  10123  1    3.42   0.079 .  
+    ## Residuals           62200 21                    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
     ##     
-    ## 313 
+    ## 311 
     ## 
     ##  Location 
     ##     Slope City
-    ##       314  311
+    ##       312  309
     ## rep    13   12
     ## 
     ##  Rock.type 
     ##     Chalk Limestone
-    ##       307       318
+    ##       306       316
     ## rep    13        12
     ## 
     ##  Location:Rock.type 
     ##         Rock.type
     ## Location Chalk Limestone
-    ##    Slope 292   340      
+    ##    Slope 290   339      
     ##    rep     7     6      
-    ##    City  326   296      
+    ##    City  325   293      
     ##    rep     6     6
 
     ## Call:
@@ -3278,7 +3234,7 @@ data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.",
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares        65       705               9787     62082
+    ## Sum of Squares        68       647              10123     62200
     ## Deg. of Freedom        1         1                  1        21
     ## 
     ## Residual standard error: 54.4
@@ -3363,7 +3319,7 @@ Chalk
 
 <td style="text-align:right;">
 
-292
+290
 
 </td>
 
@@ -3381,13 +3337,13 @@ Chalk
 
 <td style="text-align:right;">
 
-249
+247
 
 </td>
 
 <td style="text-align:right;">
 
-334
+333
 
 </td>
 
@@ -3409,7 +3365,7 @@ Chalk
 
 <td style="text-align:right;">
 
-326
+325
 
 </td>
 
@@ -3427,13 +3383,13 @@ Chalk
 
 <td style="text-align:right;">
 
-280
+279
 
 </td>
 
 <td style="text-align:right;">
 
-372
+371
 
 </td>
 
@@ -3455,7 +3411,7 @@ Limestone
 
 <td style="text-align:right;">
 
-340
+339
 
 </td>
 
@@ -3473,13 +3429,13 @@ Limestone
 
 <td style="text-align:right;">
 
-294
+293
 
 </td>
 
 <td style="text-align:right;">
 
-387
+385
 
 </td>
 
@@ -3501,7 +3457,7 @@ Limestone
 
 <td style="text-align:right;">
 
-296
+293
 
 </td>
 
@@ -3519,13 +3475,13 @@ Limestone
 
 <td style="text-align:right;">
 
-249
+247
 
 </td>
 
 <td style="text-align:right;">
 
-342
+340
 
 </td>
 
@@ -3544,12 +3500,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate   SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk            -34.6 30.2 21 -1.143  0.6680 
-    ##  Slope Chalk - Slope Limestone       -48.8 30.2 21 -1.614  0.3930 
-    ##  Slope Chalk - City Limestone         -4.1 30.2 21 -0.135  0.9990 
-    ##  City Chalk - Slope Limestone        -14.3 31.4 21 -0.454  0.9680 
-    ##  City Chalk - City Limestone          30.5 31.4 21  0.971  0.7670 
-    ##  Slope Limestone - City Limestone     44.8 31.4 21  1.426  0.4980 
+    ##  Slope Chalk - City Chalk            -35.2 30.3 21 -1.161  0.6570 
+    ##  Slope Chalk - Slope Limestone       -49.0 30.3 21 -1.619  0.3900 
+    ##  Slope Chalk - City Limestone         -3.5 30.3 21 -0.116  0.9990 
+    ##  City Chalk - Slope Limestone        -13.9 31.4 21 -0.442  0.9700 
+    ##  City Chalk - City Limestone          31.6 31.4 21  1.007  0.7470 
+    ##  Slope Limestone - City Limestone     45.5 31.4 21  1.449  0.4850 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -3648,7 +3604,7 @@ Chalk
 
 <td style="text-align:right;">
 
-292
+290
 
 </td>
 
@@ -3666,13 +3622,13 @@ Chalk
 
 <td style="text-align:right;">
 
-236
+234
 
 </td>
 
 <td style="text-align:right;">
 
-347
+346
 
 </td>
 
@@ -3706,7 +3662,7 @@ Limestone
 
 <td style="text-align:right;">
 
-296
+293
 
 </td>
 
@@ -3724,13 +3680,13 @@ Limestone
 
 <td style="text-align:right;">
 
-235
+233
 
 </td>
 
 <td style="text-align:right;">
 
-356
+354
 
 </td>
 
@@ -3764,7 +3720,7 @@ Chalk
 
 <td style="text-align:right;">
 
-326
+325
 
 </td>
 
@@ -3782,13 +3738,13 @@ Chalk
 
 <td style="text-align:right;">
 
-266
+265
 
 </td>
 
 <td style="text-align:right;">
 
-387
+386
 
 </td>
 
@@ -3822,7 +3778,7 @@ Limestone
 
 <td style="text-align:right;">
 
-340
+339
 
 </td>
 
@@ -3840,13 +3796,13 @@ Limestone
 
 <td style="text-align:right;">
 
-280
+278
 
 </td>
 
 <td style="text-align:right;">
 
-401
+399
 
 </td>
 
@@ -3931,25 +3887,25 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-64.6
+67.7
 
 </td>
 
 <td style="text-align:right;">
 
-64.6
+67.7
 
 </td>
 
 <td style="text-align:right;">
 
-0.022
+0.023
 
 </td>
 
 <td style="text-align:right;">
 
-0.884
+0.881
 
 </td>
 
@@ -3971,31 +3927,31 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-704.8
+647.2
 
 </td>
 
 <td style="text-align:right;">
 
-704.8
+647.2
 
 </td>
 
 <td style="text-align:right;">
 
-0.238
+0.218
 
 </td>
 
 <td style="text-align:right;">
 
-0.630
+0.645
 
 </td>
 
 <td style="text-align:right;">
 
-0.010
+0.009
 
 </td>
 
@@ -4011,31 +3967,31 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-9786.6
+10123.1
 
 </td>
 
 <td style="text-align:right;">
 
-9786.6
+10123.1
 
 </td>
 
 <td style="text-align:right;">
 
-3.310
+3.418
 
 </td>
 
 <td style="text-align:right;">
 
-0.083
+0.079
 
 </td>
 
 <td style="text-align:right;">
 
-0.135
+0.139
 
 </td>
 
@@ -4051,19 +4007,13 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-62081.9
+62200.5
 
 </td>
 
 <td style="text-align:right;">
 
-2956.3
-
-</td>
-
-<td style="text-align:right;">
-
-NA
+2961.9
 
 </td>
 
@@ -4075,7 +4025,13 @@ NA
 
 <td style="text-align:right;">
 
-0.855
+NA
+
+</td>
+
+<td style="text-align:right;">
+
+0.852
 
 </td>
 
@@ -4107,10 +4063,10 @@ emmip(mod_obsS, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares      1.07      0.18               0.16      4.41
+    ## Sum of Squares      1.33      0.09               0.26      4.79
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 0.458
+    ## Residual standard error: 0.478
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-3.svg)<!-- -->
@@ -4120,26 +4076,26 @@ emmip(mod_obsS, Location ~ Rock.type)
     ## 
     ## Response: Estimate
     ##                    Sum Sq Df F value Pr(>F)    
-    ## (Intercept)         313.2  1 1491.16 <2e-16 ***
-    ## Location              1.1  1    5.38   0.03 *  
-    ## Rock.type             0.2  1    0.78   0.39    
-    ## Location:Rock.type    0.2  1    0.74   0.40    
-    ## Residuals             4.4 21                   
+    ## (Intercept)         308.9  1 1353.08 <2e-16 ***
+    ## Location              1.4  1    6.10  0.022 *  
+    ## Rock.type             0.1  1    0.36  0.554    
+    ## Location:Rock.type    0.3  1    1.15  0.295    
+    ## Residuals             4.8 21                   
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
     ##      
-    ## 3.55 
+    ## 3.53 
     ## 
     ##  Location 
     ##     Slope  City
-    ##      3.75  3.33
+    ##      3.75  3.29
     ## rep 13.00 12.00
     ## 
     ##  Rock.type 
     ##     Chalk Limestone
-    ##      3.47      3.64
+    ##      3.47      3.59
     ## rep 13.00     12.00
     ## 
     ##  Location:Rock.type 
@@ -4147,7 +4103,7 @@ emmip(mod_obsS, Location ~ Rock.type)
     ## Location Chalk Limestone
     ##    Slope 3.60  3.92     
     ##    rep   7.00  6.00     
-    ##    City  3.33  3.34     
+    ##    City  3.33  3.24     
     ##    rep   6.00  6.00
 
     ## Call:
@@ -4156,10 +4112,10 @@ emmip(mod_obsS, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares      1.07      0.18               0.16      4.41
+    ## Sum of Squares      1.33      0.09               0.26      4.79
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 0.458
+    ## Residual standard error: 0.478
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -4247,7 +4203,7 @@ Chalk
 
 <td style="text-align:right;">
 
-0.173
+0.181
 
 </td>
 
@@ -4259,13 +4215,13 @@ Chalk
 
 <td style="text-align:right;">
 
-3.24
+3.22
 
 </td>
 
 <td style="text-align:right;">
 
-3.96
+3.98
 
 </td>
 
@@ -4293,7 +4249,7 @@ Chalk
 
 <td style="text-align:right;">
 
-0.187
+0.195
 
 </td>
 
@@ -4305,13 +4261,13 @@ Chalk
 
 <td style="text-align:right;">
 
-2.94
+2.93
 
 </td>
 
 <td style="text-align:right;">
 
-3.72
+3.74
 
 </td>
 
@@ -4339,7 +4295,7 @@ Limestone
 
 <td style="text-align:right;">
 
-0.187
+0.195
 
 </td>
 
@@ -4351,13 +4307,13 @@ Limestone
 
 <td style="text-align:right;">
 
-3.53
+3.51
 
 </td>
 
 <td style="text-align:right;">
 
-4.31
+4.33
 
 </td>
 
@@ -4379,13 +4335,13 @@ Limestone
 
 <td style="text-align:right;">
 
-3.34
+3.24
 
 </td>
 
 <td style="text-align:right;">
 
-0.187
+0.195
 
 </td>
 
@@ -4397,13 +4353,13 @@ Limestone
 
 <td style="text-align:right;">
 
-2.95
+2.84
 
 </td>
 
 <td style="text-align:right;">
 
-3.73
+3.65
 
 </td>
 
@@ -4422,12 +4378,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate    SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk            0.268 0.255 21  1.050  0.7220 
-    ##  Slope Chalk - Slope Limestone      -0.321 0.255 21 -1.258  0.5980 
-    ##  Slope Chalk - City Limestone        0.264 0.255 21  1.035  0.7310 
-    ##  City Chalk - Slope Limestone       -0.589 0.265 21 -2.225  0.1490 
-    ##  City Chalk - City Limestone        -0.004 0.265 21 -0.015  1.0000 
-    ##  Slope Limestone - City Limestone    0.585 0.265 21  2.210  0.1530 
+    ##  Slope Chalk - City Chalk            0.268 0.266 21  1.007  0.7470 
+    ##  Slope Chalk - Slope Limestone      -0.321 0.266 21 -1.206  0.6300 
+    ##  Slope Chalk - City Limestone        0.358 0.266 21  1.347  0.5450 
+    ##  City Chalk - Slope Limestone       -0.588 0.276 21 -2.133  0.1750 
+    ##  City Chalk - City Limestone         0.090 0.276 21  0.328  0.9880 
+    ##  Slope Limestone - City Limestone    0.679 0.276 21  2.460  0.0960 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -4508,6 +4464,64 @@ upper.CL
 
 <td style="text-align:left;">
 
+4
+
+</td>
+
+<td style="text-align:left;">
+
+City
+
+</td>
+
+<td style="text-align:left;">
+
+Limestone
+
+</td>
+
+<td style="text-align:right;">
+
+3.24
+
+</td>
+
+<td style="text-align:right;">
+
+0.195
+
+</td>
+
+<td style="text-align:right;">
+
+21
+
+</td>
+
+<td style="text-align:right;">
+
+2.71
+
+</td>
+
+<td style="text-align:right;">
+
+3.77
+
+</td>
+
+<td style="text-align:left;">
+
+a
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
 2
 
 </td>
@@ -4532,7 +4546,7 @@ Chalk
 
 <td style="text-align:right;">
 
-0.187
+0.195
 
 </td>
 
@@ -4544,71 +4558,13 @@ Chalk
 
 <td style="text-align:right;">
 
-2.82
+2.80
 
 </td>
 
 <td style="text-align:right;">
 
-3.84
-
-</td>
-
-<td style="text-align:left;">
-
-a
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-4
-
-</td>
-
-<td style="text-align:left;">
-
-City
-
-</td>
-
-<td style="text-align:left;">
-
-Limestone
-
-</td>
-
-<td style="text-align:right;">
-
-3.34
-
-</td>
-
-<td style="text-align:right;">
-
-0.187
-
-</td>
-
-<td style="text-align:right;">
-
-21
-
-</td>
-
-<td style="text-align:right;">
-
-2.83
-
-</td>
-
-<td style="text-align:right;">
-
-3.85
+3.86
 
 </td>
 
@@ -4648,7 +4604,7 @@ Chalk
 
 <td style="text-align:right;">
 
-0.173
+0.181
 
 </td>
 
@@ -4660,13 +4616,13 @@ Chalk
 
 <td style="text-align:right;">
 
-3.13
+3.11
 
 </td>
 
 <td style="text-align:right;">
 
-4.07
+4.09
 
 </td>
 
@@ -4706,7 +4662,7 @@ Limestone
 
 <td style="text-align:right;">
 
-0.187
+0.195
 
 </td>
 
@@ -4718,13 +4674,13 @@ Limestone
 
 <td style="text-align:right;">
 
-3.41
+3.39
 
 </td>
 
 <td style="text-align:right;">
 
-4.43
+4.45
 
 </td>
 
@@ -4809,71 +4765,31 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-1.069
+1.325
 
 </td>
 
 <td style="text-align:right;">
 
-1.069
+1.325
 
 </td>
 
 <td style="text-align:right;">
 
-5.090
+5.804
 
 </td>
 
 <td style="text-align:right;">
 
-0.035
+0.025
 
 </td>
 
 <td style="text-align:right;">
 
-0.184
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:right;">
-
-1
-
-</td>
-
-<td style="text-align:right;">
-
-0.176
-
-</td>
-
-<td style="text-align:right;">
-
-0.176
-
-</td>
-
-<td style="text-align:right;">
-
-0.839
-
-</td>
-
-<td style="text-align:right;">
-
-0.370
-
-</td>
-
-<td style="text-align:right;">
-
-0.030
+0.205
 
 </td>
 
@@ -4889,31 +4805,71 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-0.156
+0.094
 
 </td>
 
 <td style="text-align:right;">
 
-0.156
+0.094
 
 </td>
 
 <td style="text-align:right;">
 
-0.744
+0.412
 
 </td>
 
 <td style="text-align:right;">
 
-0.398
+0.528
 
 </td>
 
 <td style="text-align:right;">
 
-0.027
+0.015
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:right;">
+
+1
+
+</td>
+
+<td style="text-align:right;">
+
+0.263
+
+</td>
+
+<td style="text-align:right;">
+
+0.263
+
+</td>
+
+<td style="text-align:right;">
+
+1.151
+
+</td>
+
+<td style="text-align:right;">
+
+0.295
+
+</td>
+
+<td style="text-align:right;">
+
+0.041
 
 </td>
 
@@ -4929,19 +4885,13 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-4.411
+4.795
 
 </td>
 
 <td style="text-align:right;">
 
-0.210
-
-</td>
-
-<td style="text-align:right;">
-
-NA
+0.228
 
 </td>
 
@@ -4953,7 +4903,13 @@ NA
 
 <td style="text-align:right;">
 
-0.759
+NA
+
+</td>
+
+<td style="text-align:right;">
+
+0.740
 
 </td>
 
@@ -4983,10 +4939,10 @@ emmip(mod_Shannon, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares         3      1924               8494     70754
+    ## Sum of Squares        10      1969               8756     68810
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 58
+    ## Residual standard error: 57.2
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-5.svg)<!-- -->
@@ -4996,34 +4952,34 @@ emmip(mod_Shannon, Location ~ Rock.type)
     ## 
     ## Response: Estimate
     ##                     Sum Sq Df F value Pr(>F)    
-    ## (Intercept)        4356003  1 1292.88 <2e-16 ***
-    ## Location                12  1    0.00   0.95    
-    ## Rock.type             1634  1    0.48   0.49    
-    ## Location:Rock.type    8494  1    2.52   0.13    
-    ## Residuals            70754 21                   
+    ## (Intercept)        4281315  1 1306.61 <2e-16 ***
+    ## Location                 4  1    0.00   0.97    
+    ## Rock.type             1671  1    0.51   0.48    
+    ## Location:Rock.type    8756  1    2.67   0.12    
+    ## Residuals            68810 21                   
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
     ##     
-    ## 417 
+    ## 414 
     ## 
     ##  Location 
     ##     Slope City
-    ##       417  418
+    ##       413  414
     ## rep    13   12
     ## 
     ##  Rock.type 
     ##     Chalk Limestone
-    ##       409       426
+    ##       405       423
     ## rep    13        12
     ## 
     ##  Location:Rock.type 
     ##         Rock.type
     ## Location Chalk Limestone
-    ##    Slope 392   446      
+    ##    Slope 388   442      
     ##    rep     7     6      
-    ##    City  428   407      
+    ##    City  425   404      
     ##    rep     6     6
 
     ## Call:
@@ -5032,10 +4988,10 @@ emmip(mod_Shannon, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares         3      1924               8494     70754
+    ## Sum of Squares        10      1969               8756     68810
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 58
+    ## Residual standard error: 57.2
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -5117,13 +5073,13 @@ Chalk
 
 <td style="text-align:right;">
 
-392
+388
 
 </td>
 
 <td style="text-align:right;">
 
-21.9
+21.6
 
 </td>
 
@@ -5135,13 +5091,13 @@ Chalk
 
 <td style="text-align:right;">
 
-347
+343
 
 </td>
 
 <td style="text-align:right;">
 
-438
+433
 
 </td>
 
@@ -5163,13 +5119,13 @@ Chalk
 
 <td style="text-align:right;">
 
-428
+425
 
 </td>
 
 <td style="text-align:right;">
 
-23.7
+23.4
 
 </td>
 
@@ -5181,13 +5137,13 @@ Chalk
 
 <td style="text-align:right;">
 
-379
+376
 
 </td>
 
 <td style="text-align:right;">
 
-477
+474
 
 </td>
 
@@ -5209,13 +5165,13 @@ Limestone
 
 <td style="text-align:right;">
 
-446
+442
 
 </td>
 
 <td style="text-align:right;">
 
-23.7
+23.4
 
 </td>
 
@@ -5227,13 +5183,13 @@ Limestone
 
 <td style="text-align:right;">
 
-396
+394
 
 </td>
 
 <td style="text-align:right;">
 
-495
+491
 
 </td>
 
@@ -5255,13 +5211,13 @@ Limestone
 
 <td style="text-align:right;">
 
-407
+404
 
 </td>
 
 <td style="text-align:right;">
 
-23.7
+23.4
 
 </td>
 
@@ -5273,13 +5229,13 @@ Limestone
 
 <td style="text-align:right;">
 
-358
+355
 
 </td>
 
 <td style="text-align:right;">
 
-457
+452
 
 </td>
 
@@ -5298,12 +5254,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate   SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk            -35.5 32.3 21 -1.101  0.6930 
-    ##  Slope Chalk - Slope Limestone       -53.2 32.3 21 -1.646  0.3760 
-    ##  Slope Chalk - City Limestone        -14.8 32.3 21 -0.458  0.9670 
-    ##  City Chalk - Slope Limestone        -17.6 33.5 21 -0.525  0.9520 
-    ##  City Chalk - City Limestone          20.7 33.5 21  0.619  0.9250 
-    ##  Slope Limestone - City Limestone     38.4 33.5 21  1.144  0.6670 
+    ##  Slope Chalk - City Chalk            -36.7 31.8 21 -1.153  0.6620 
+    ##  Slope Chalk - Slope Limestone       -53.9 31.8 21 -1.693  0.3520 
+    ##  Slope Chalk - City Limestone        -15.6 31.8 21 -0.490  0.9610 
+    ##  City Chalk - Slope Limestone        -17.2 33.0 21 -0.520  0.9530 
+    ##  City Chalk - City Limestone          21.1 33.0 21  0.639  0.9180 
+    ##  Slope Limestone - City Limestone     38.3 33.0 21  1.159  0.6580 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -5402,13 +5358,13 @@ Chalk
 
 <td style="text-align:right;">
 
-392
+388
 
 </td>
 
 <td style="text-align:right;">
 
-21.9
+21.6
 
 </td>
 
@@ -5420,13 +5376,13 @@ Chalk
 
 <td style="text-align:right;">
 
-333
+329
 
 </td>
 
 <td style="text-align:right;">
 
-452
+447
 
 </td>
 
@@ -5460,13 +5416,13 @@ Limestone
 
 <td style="text-align:right;">
 
-407
+404
 
 </td>
 
 <td style="text-align:right;">
 
-23.7
+23.4
 
 </td>
 
@@ -5478,13 +5434,13 @@ Limestone
 
 <td style="text-align:right;">
 
-343
+340
 
 </td>
 
 <td style="text-align:right;">
 
-472
+467
 
 </td>
 
@@ -5518,13 +5474,13 @@ Chalk
 
 <td style="text-align:right;">
 
-428
+425
 
 </td>
 
 <td style="text-align:right;">
 
-23.7
+23.4
 
 </td>
 
@@ -5536,13 +5492,13 @@ Chalk
 
 <td style="text-align:right;">
 
-363
+361
 
 </td>
 
 <td style="text-align:right;">
 
-493
+489
 
 </td>
 
@@ -5576,13 +5532,13 @@ Limestone
 
 <td style="text-align:right;">
 
-446
+442
 
 </td>
 
 <td style="text-align:right;">
 
-23.7
+23.4
 
 </td>
 
@@ -5594,13 +5550,13 @@ Limestone
 
 <td style="text-align:right;">
 
-381
+378
 
 </td>
 
 <td style="text-align:right;">
 
-510
+506
 
 </td>
 
@@ -5685,25 +5641,25 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-2.54
+10.1
 
 </td>
 
 <td style="text-align:right;">
 
-2.54
+10.1
 
 </td>
 
 <td style="text-align:right;">
 
-0.001
+0.003
 
 </td>
 
 <td style="text-align:right;">
 
-0.978
+0.956
 
 </td>
 
@@ -5725,31 +5681,31 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-1923.90
+1969.3
 
 </td>
 
 <td style="text-align:right;">
 
-1923.90
+1969.3
 
 </td>
 
 <td style="text-align:right;">
 
-0.571
+0.601
 
 </td>
 
 <td style="text-align:right;">
 
-0.458
+0.447
 
 </td>
 
 <td style="text-align:right;">
 
-0.024
+0.025
 
 </td>
 
@@ -5765,31 +5721,31 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-8494.42
+8755.5
 
 </td>
 
 <td style="text-align:right;">
 
-8494.42
+8755.5
 
 </td>
 
 <td style="text-align:right;">
 
-2.521
+2.672
 
 </td>
 
 <td style="text-align:right;">
 
-0.127
+0.117
 
 </td>
 
 <td style="text-align:right;">
 
-0.105
+0.110
 
 </td>
 
@@ -5805,19 +5761,13 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-70753.94
+68809.7
 
 </td>
 
 <td style="text-align:right;">
 
-3369.24
-
-</td>
-
-<td style="text-align:right;">
-
-NA
+3276.7
 
 </td>
 
@@ -5829,7 +5779,13 @@ NA
 
 <td style="text-align:right;">
 
-0.872
+NA
+
+</td>
+
+<td style="text-align:right;">
+
+0.865
 
 </td>
 
@@ -5861,10 +5817,10 @@ emmip(mod_ACE, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares       470       125                 99      1025
+    ## Sum of Squares       508       107                117      1060
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 6.99
+    ## Residual standard error: 7.1
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-7.svg)<!-- -->
@@ -5873,27 +5829,27 @@ emmip(mod_ACE, Location ~ Rock.type)
     ## Anova Table (Type III tests)
     ## 
     ## Response: Estimate
-    ##                    Sum Sq Df F value Pr(>F)    
-    ## (Intercept)          7498  1  153.60  4e-11 ***
-    ## Location              504  1   10.33 0.0042 ** 
-    ## Rock.type             117  1    2.40 0.1364    
-    ## Location:Rock.type     99  1    2.03 0.1686    
-    ## Residuals            1025 21                   
+    ##                    Sum Sq Df F value  Pr(>F)    
+    ## (Intercept)          7346  1  145.56 6.6e-11 ***
+    ## Location              543  1   10.76  0.0036 ** 
+    ## Rock.type              99  1    1.96  0.1757    
+    ## Location:Rock.type    117  1    2.32  0.1427    
+    ## Residuals            1060 21                    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
     ##      
-    ## 17.4 
+    ## 17.2 
     ## 
     ##  Location 
     ##     Slope City
-    ##      21.5 12.9
+    ##      21.5 12.5
     ## rep  13.0 12.0
     ## 
     ##  Rock.type 
     ##     Chalk Limestone
-    ##      15.2      19.7
+    ##      15.2      19.4
     ## rep  13.0      12.0
     ## 
     ##  Location:Rock.type 
@@ -5901,7 +5857,7 @@ emmip(mod_ACE, Location ~ Rock.type)
     ## Location Chalk Limestone
     ##    Slope 17.7  26.0     
     ##    rep    7.0   6.0     
-    ##    City  12.7  13.0     
+    ##    City  12.7  12.3     
     ##    rep    6.0   6.0
 
     ## Call:
@@ -5910,10 +5866,10 @@ emmip(mod_ACE, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares       470       125                 99      1025
+    ## Sum of Squares       508       107                117      1060
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 6.99
+    ## Residual standard error: 7.1
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -6001,7 +5957,7 @@ Chalk
 
 <td style="text-align:right;">
 
-2.64
+2.69
 
 </td>
 
@@ -6013,13 +5969,13 @@ Chalk
 
 <td style="text-align:right;">
 
-12.20
+12.10
 
 </td>
 
 <td style="text-align:right;">
 
-23.2
+23.3
 
 </td>
 
@@ -6047,7 +6003,7 @@ Chalk
 
 <td style="text-align:right;">
 
-2.85
+2.90
 
 </td>
 
@@ -6059,13 +6015,13 @@ Chalk
 
 <td style="text-align:right;">
 
-6.75
+6.65
 
 </td>
 
 <td style="text-align:right;">
 
-18.6
+18.7
 
 </td>
 
@@ -6093,7 +6049,7 @@ Limestone
 
 <td style="text-align:right;">
 
-2.85
+2.90
 
 </td>
 
@@ -6105,7 +6061,7 @@ Limestone
 
 <td style="text-align:right;">
 
-20.09
+19.98
 
 </td>
 
@@ -6133,13 +6089,13 @@ Limestone
 
 <td style="text-align:right;">
 
-13.0
+12.3
 
 </td>
 
 <td style="text-align:right;">
 
-2.85
+2.90
 
 </td>
 
@@ -6151,13 +6107,13 @@ Limestone
 
 <td style="text-align:right;">
 
-7.09
+6.31
 
 </td>
 
 <td style="text-align:right;">
 
-19.0
+18.4
 
 </td>
 
@@ -6176,12 +6132,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate   SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk             5.01 3.89 21  1.290  0.5800 
-    ##  Slope Chalk - Slope Limestone       -8.33 3.89 21 -2.140  0.1720 
-    ##  Slope Chalk - City Limestone         4.67 3.89 21  1.200  0.6330 
-    ##  City Chalk - Slope Limestone       -13.34 4.03 21 -3.310  0.0160 
-    ##  City Chalk - City Limestone         -0.34 4.03 21 -0.090  1.0000 
-    ##  Slope Limestone - City Limestone    13.00 4.03 21  3.220  0.0200 
+    ##  Slope Chalk - City Chalk             5.00 3.95 21  1.270  0.5940 
+    ##  Slope Chalk - Slope Limestone       -8.33 3.95 21 -2.110  0.1830 
+    ##  Slope Chalk - City Limestone         5.35 3.95 21  1.350  0.5410 
+    ##  City Chalk - Slope Limestone       -13.33 4.10 21 -3.250  0.0190 
+    ##  City Chalk - City Limestone          0.35 4.10 21  0.080  1.0000 
+    ##  Slope Limestone - City Limestone    13.68 4.10 21  3.330  0.0150 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -6262,6 +6218,64 @@ upper.CL
 
 <td style="text-align:left;">
 
+4
+
+</td>
+
+<td style="text-align:left;">
+
+City
+
+</td>
+
+<td style="text-align:left;">
+
+Limestone
+
+</td>
+
+<td style="text-align:right;">
+
+12.3
+
+</td>
+
+<td style="text-align:right;">
+
+2.90
+
+</td>
+
+<td style="text-align:right;">
+
+21
+
+</td>
+
+<td style="text-align:right;">
+
+4.44
+
+</td>
+
+<td style="text-align:right;">
+
+20.2
+
+</td>
+
+<td style="text-align:left;">
+
+a
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:left;">
+
 2
 
 </td>
@@ -6286,7 +6300,7 @@ Chalk
 
 <td style="text-align:right;">
 
-2.85
+2.90
 
 </td>
 
@@ -6298,71 +6312,13 @@ Chalk
 
 <td style="text-align:right;">
 
-4.92
+4.79
 
 </td>
 
 <td style="text-align:right;">
 
-20.4
-
-</td>
-
-<td style="text-align:left;">
-
-a
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:left;">
-
-4
-
-</td>
-
-<td style="text-align:left;">
-
-City
-
-</td>
-
-<td style="text-align:left;">
-
-Limestone
-
-</td>
-
-<td style="text-align:right;">
-
-13.0
-
-</td>
-
-<td style="text-align:right;">
-
-2.85
-
-</td>
-
-<td style="text-align:right;">
-
-21
-
-</td>
-
-<td style="text-align:right;">
-
-5.26
-
-</td>
-
-<td style="text-align:right;">
-
-20.8
+20.6
 
 </td>
 
@@ -6402,7 +6358,7 @@ Chalk
 
 <td style="text-align:right;">
 
-2.64
+2.69
 
 </td>
 
@@ -6414,13 +6370,13 @@ Chalk
 
 <td style="text-align:right;">
 
-10.50
+10.37
 
 </td>
 
 <td style="text-align:right;">
 
-24.9
+25.0
 
 </td>
 
@@ -6460,7 +6416,7 @@ Limestone
 
 <td style="text-align:right;">
 
-2.85
+2.90
 
 </td>
 
@@ -6472,13 +6428,13 @@ Limestone
 
 <td style="text-align:right;">
 
-18.26
+18.12
 
 </td>
 
 <td style="text-align:right;">
 
-33.8
+33.9
 
 </td>
 
@@ -6563,19 +6519,19 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-470.4
+508
 
 </td>
 
 <td style="text-align:right;">
 
-470.4
+507.7
 
 </td>
 
 <td style="text-align:right;">
 
-9.64
+10.06
 
 </td>
 
@@ -6587,7 +6543,7 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-0.273
+0.283
 
 </td>
 
@@ -6603,31 +6559,31 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-125.3
+107
 
 </td>
 
 <td style="text-align:right;">
 
-125.3
+107.4
 
 </td>
 
 <td style="text-align:right;">
 
-2.57
+2.13
 
 </td>
 
 <td style="text-align:right;">
 
-0.124
+0.159
 
 </td>
 
 <td style="text-align:right;">
 
-0.073
+0.060
 
 </td>
 
@@ -6643,31 +6599,31 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-99.3
+117
 
 </td>
 
 <td style="text-align:right;">
 
-99.3
+117.0
 
 </td>
 
 <td style="text-align:right;">
 
-2.03
+2.32
 
 </td>
 
 <td style="text-align:right;">
 
-0.169
+0.143
 
 </td>
 
 <td style="text-align:right;">
 
-0.058
+0.065
 
 </td>
 
@@ -6683,19 +6639,13 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-1025.0
+1060
 
 </td>
 
 <td style="text-align:right;">
 
-48.8
-
-</td>
-
-<td style="text-align:right;">
-
-NA
+50.5
 
 </td>
 
@@ -6707,7 +6657,13 @@ NA
 
 <td style="text-align:right;">
 
-0.596
+NA
+
+</td>
+
+<td style="text-align:right;">
+
+0.591
 
 </td>
 
@@ -6740,10 +6696,10 @@ emmip(mod_InvSim, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares    0.0643    0.0133             0.0000    0.1080
+    ## Sum of Squares    0.0718    0.0103             0.0002    0.1120
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 0.0717
+    ## Residual standard error: 0.073
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-9.svg)<!-- -->
@@ -6753,26 +6709,26 @@ emmip(mod_InvSim, Location ~ Rock.type)
     ## 
     ## Response: Estimate
     ##                    Sum Sq Df F value  Pr(>F)    
-    ## (Intercept)         0.924  1  179.69 9.2e-12 ***
-    ## Location            0.066  1   12.92  0.0017 ** 
-    ## Rock.type           0.013  1    2.59  0.1228    
-    ## Location:Rock.type  0.000  1    0.00  0.9939    
-    ## Residuals           0.108 21                    
+    ## (Intercept)         0.952  1  178.41 9.9e-12 ***
+    ## Location            0.074  1   13.87  0.0013 ** 
+    ## Rock.type           0.010  1    1.91  0.1817    
+    ## Location:Rock.type  0.000  1    0.04  0.8508    
+    ## Residuals           0.112 21                    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
     ##       
-    ## 0.192 
+    ## 0.194 
     ## 
     ##  Location 
-    ##      Slope   City
-    ##      0.143  0.244
-    ## rep 13.000 12.000
+    ##      Slope  City
+    ##      0.143  0.25
+    ## rep 13.000 12.00
     ## 
     ##  Rock.type 
     ##      Chalk Limestone
-    ##      0.214     0.168
+    ##      0.214     0.173
     ## rep 13.000    12.000
     ## 
     ##  Location:Rock.type 
@@ -6780,7 +6736,7 @@ emmip(mod_InvSim, Location ~ Rock.type)
     ## Location Chalk Limestone
     ##    Slope 0.16  0.12     
     ##    rep   7.00  6.00     
-    ##    City  0.27  0.22     
+    ##    City  0.27  0.23     
     ##    rep   6.00  6.00
 
     ## Call:
@@ -6789,10 +6745,10 @@ emmip(mod_InvSim, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares    0.0643    0.0133             0.0000    0.1080
+    ## Sum of Squares    0.0718    0.0103             0.0002    0.1120
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 0.0717
+    ## Residual standard error: 0.073
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -6880,7 +6836,7 @@ Chalk
 
 <td style="text-align:right;">
 
-0.027
+0.028
 
 </td>
 
@@ -6892,13 +6848,13 @@ Chalk
 
 <td style="text-align:right;">
 
-0.108
+0.107
 
 </td>
 
 <td style="text-align:right;">
 
-0.220
+0.221
 
 </td>
 
@@ -6926,7 +6882,7 @@ Chalk
 
 <td style="text-align:right;">
 
-0.029
+0.030
 
 </td>
 
@@ -6938,13 +6894,13 @@ Chalk
 
 <td style="text-align:right;">
 
-0.207
+0.206
 
 </td>
 
 <td style="text-align:right;">
 
-0.328
+0.330
 
 </td>
 
@@ -6972,7 +6928,7 @@ Limestone
 
 <td style="text-align:right;">
 
-0.029
+0.030
 
 </td>
 
@@ -6984,13 +6940,13 @@ Limestone
 
 <td style="text-align:right;">
 
-0.057
+0.056
 
 </td>
 
 <td style="text-align:right;">
 
-0.179
+0.180
 
 </td>
 
@@ -7012,13 +6968,13 @@ Limestone
 
 <td style="text-align:right;">
 
-0.221
+0.233
 
 </td>
 
 <td style="text-align:right;">
 
-0.029
+0.030
 
 </td>
 
@@ -7030,13 +6986,13 @@ Limestone
 
 <td style="text-align:right;">
 
-0.160
+0.171
 
 </td>
 
 <td style="text-align:right;">
 
-0.282
+0.295
 
 </td>
 
@@ -7055,12 +7011,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate     SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk          -0.1035 0.0399 21 -2.600  0.0740 
-    ##  Slope Chalk - Slope Limestone      0.0460 0.0399 21  1.150  0.6620 
-    ##  Slope Chalk - City Limestone      -0.0571 0.0399 21 -1.430  0.4950 
-    ##  City Chalk - Slope Limestone       0.1495 0.0414 21  3.610  0.0080 
-    ##  City Chalk - City Limestone        0.0464 0.0414 21  1.120  0.6800 
-    ##  Slope Limestone - City Limestone  -0.1031 0.0414 21 -2.490  0.0910 
+    ##  Slope Chalk - City Chalk          -0.1035 0.0406 21 -2.550  0.0810 
+    ##  Slope Chalk - Slope Limestone      0.0460 0.0406 21  1.130  0.6740 
+    ##  Slope Chalk - City Limestone      -0.0686 0.0406 21 -1.690  0.3550 
+    ##  City Chalk - Slope Limestone       0.1495 0.0422 21  3.540  0.0100 
+    ##  City Chalk - City Limestone        0.0349 0.0422 21  0.830  0.8410 
+    ##  Slope Limestone - City Limestone  -0.1146 0.0422 21 -2.720  0.0580 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -7165,7 +7121,7 @@ Limestone
 
 <td style="text-align:right;">
 
-0.029
+0.030
 
 </td>
 
@@ -7177,13 +7133,13 @@ Limestone
 
 <td style="text-align:right;">
 
-0.038
+0.037
 
 </td>
 
 <td style="text-align:right;">
 
-0.198
+0.199
 
 </td>
 
@@ -7223,7 +7179,7 @@ Chalk
 
 <td style="text-align:right;">
 
-0.027
+0.028
 
 </td>
 
@@ -7235,13 +7191,13 @@ Chalk
 
 <td style="text-align:right;">
 
-0.090
+0.089
 
 </td>
 
 <td style="text-align:right;">
 
-0.238
+0.239
 
 </td>
 
@@ -7275,13 +7231,13 @@ Limestone
 
 <td style="text-align:right;">
 
-0.221
+0.233
 
 </td>
 
 <td style="text-align:right;">
 
-0.029
+0.030
 
 </td>
 
@@ -7293,13 +7249,13 @@ Limestone
 
 <td style="text-align:right;">
 
-0.141
+0.151
 
 </td>
 
 <td style="text-align:right;">
 
-0.301
+0.314
 
 </td>
 
@@ -7339,7 +7295,7 @@ Chalk
 
 <td style="text-align:right;">
 
-0.029
+0.030
 
 </td>
 
@@ -7351,13 +7307,13 @@ Chalk
 
 <td style="text-align:right;">
 
-0.188
+0.186
 
 </td>
 
 <td style="text-align:right;">
 
-0.347
+0.349
 
 </td>
 
@@ -7442,65 +7398,7 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-0.064
-
-</td>
-
-<td style="text-align:right;">
-
-0.064
-
-</td>
-
-<td style="text-align:right;">
-
-12.52
-
-</td>
-
-<td style="text-align:right;">
-
-0.002
-
-</td>
-
-<td style="text-align:right;">
-
-0.347
-
-</td>
-
-</tr>
-
-<tr>
-
-<td style="text-align:right;">
-
-1
-
-</td>
-
-<td style="text-align:right;">
-
-0.013
-
-</td>
-
-<td style="text-align:right;">
-
-0.013
-
-</td>
-
-<td style="text-align:right;">
-
-2.59
-
-</td>
-
-<td style="text-align:right;">
-
-0.123
+0.072
 
 </td>
 
@@ -7510,6 +7408,64 @@ Part Eta Sq
 
 </td>
 
+<td style="text-align:right;">
+
+13.459
+
+</td>
+
+<td style="text-align:right;">
+
+0.001
+
+</td>
+
+<td style="text-align:right;">
+
+0.369
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="text-align:right;">
+
+1
+
+</td>
+
+<td style="text-align:right;">
+
+0.010
+
+</td>
+
+<td style="text-align:right;">
+
+0.010
+
+</td>
+
+<td style="text-align:right;">
+
+1.930
+
+</td>
+
+<td style="text-align:right;">
+
+0.179
+
+</td>
+
+<td style="text-align:right;">
+
+0.053
+
+</td>
+
 </tr>
 
 <tr>
@@ -7534,19 +7490,19 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-0.00
+0.036
 
 </td>
 
 <td style="text-align:right;">
 
-0.994
+0.851
 
 </td>
 
 <td style="text-align:right;">
 
-0.000
+0.001
 
 </td>
 
@@ -7562,7 +7518,7 @@ Part Eta Sq
 
 <td style="text-align:right;">
 
-0.108
+0.112
 
 </td>
 
@@ -7586,7 +7542,7 @@ NA
 
 <td style="text-align:right;">
 
-0.582
+0.577
 
 </td>
 
@@ -7703,9 +7659,9 @@ Calculate and plot beta diversity metrics.
     ## Terms added sequentially (first to last)
     ## 
     ##                    Df SumsOfSqs MeanSqs F.Model    R2 Pr(>F)  
-    ## Location            1      0.63   0.628    2.11 0.081  0.023 *
-    ## Rock.type           1      0.39   0.386    1.30 0.050  0.245  
-    ## Location:Rock.type  1      0.49   0.485    1.63 0.063  0.098 .
+    ## Location            1      0.63   0.629    2.12 0.081  0.024 *
+    ## Rock.type           1      0.39   0.386    1.30 0.050  0.231  
+    ## Location:Rock.type  1      0.49   0.486    1.63 0.063  0.101  
     ## Residuals          21      6.25   0.297         0.806         
     ## Total              24      7.75                 1.000         
     ## ---
@@ -7730,7 +7686,7 @@ Calculate and plot beta diversity metrics.
     ## Terms added sequentially (first to last)
     ## 
     ##           Df SumsOfSqs MeanSqs F.Model    R2 Pr(>F)  
-    ## Location   1      0.63   0.628    2.03 0.081  0.029 *
+    ## Location   1      0.63   0.629    2.03 0.081  0.035 *
     ## Residuals 23      7.12   0.309         0.919         
     ## Total     24      7.75                 1.000         
     ## ---
@@ -7748,7 +7704,7 @@ print(mod1_pairwise)
 ```
 
     ##          pairs total.DF F.Model     R2 p.value p.adjusted sig
-    ## 1 City - Slope       24    2.03 0.0811   0.034      0.034   .
+    ## 1 City - Slope       24    2.03 0.0812   0.038      0.038   .
 
 ``` r
 (sig_pairs1 <- list(as.character(mod1_pairwise$pairs[mod1_pairwise$p.adjusted < 0.05])))
@@ -7769,7 +7725,7 @@ print(mod2_pairwise)
 ```
 
     ##               pairs total.DF F.Model     R2 p.value p.adjusted sig
-    ## 1 Chalk - Limestone       24    1.21 0.0501    0.32       0.32
+    ## 1 Chalk - Limestone       24    1.21 0.0501   0.281      0.281
 
 ``` r
 (sig_pairs2 <- list(as.character(mod2_pairwise$pairs[mod2_pairwise$p.adjusted < 0.05])))
@@ -7790,19 +7746,19 @@ print(mod3_pairwise)
 ```
 
     ##                              pairs total.DF F.Model     R2 p.value p.adjusted sig
-    ## 1      City:Chalk - City:Limestone       11    1.20 0.1069   0.344      0.413    
-    ## 2     City:Chalk - Slope:Limestone       11    1.43 0.1251   0.180      0.270    
-    ## 3         City:Chalk - Slope:Chalk       12    2.92 0.2099   0.017      0.102    
-    ## 4 City:Limestone - Slope:Limestone       11    1.07 0.0964   0.429      0.429    
-    ## 5     City:Limestone - Slope:Chalk       12    1.98 0.1528   0.091      0.182    
-    ## 6    Slope:Limestone - Slope:Chalk       12    1.90 0.1471   0.080      0.182
+    ## 1      City:Chalk - City:Limestone       11    1.20 0.1069   0.329      0.395    
+    ## 2     City:Chalk - Slope:Limestone       11    1.43 0.1251   0.182      0.273    
+    ## 3         City:Chalk - Slope:Chalk       12    2.92 0.2099   0.012      0.072    
+    ## 4 City:Limestone - Slope:Limestone       11    1.07 0.0967   0.424      0.424    
+    ## 5     City:Limestone - Slope:Chalk       12    1.99 0.1531   0.089      0.178    
+    ## 6    Slope:Limestone - Slope:Chalk       12    1.90 0.1471   0.074      0.178
 
 ``` r
 (sig_pairs3 <- list(as.character(mod3_pairwise$pairs[mod3_pairwise$p.adjusted < 0.1])))
 ```
 
     ## [[1]]
-    ## character(0)
+    ## [1] "City:Chalk - Slope:Chalk"
 
 ``` r
 Unifrac_mat <- UniFrac(Ps_obj_filt, 
@@ -7829,11 +7785,11 @@ Unifrac_mat <- UniFrac(Ps_obj_filt,
     ## Terms added sequentially (first to last)
     ## 
     ##                    Df SumsOfSqs MeanSqs F.Model    R2 Pr(>F)  
-    ## Location            1     0.047  0.0469    1.37 0.053  0.214  
-    ## Rock.type           1     0.053  0.0529    1.54 0.060  0.147  
-    ## Location:Rock.type  1     0.063  0.0632    1.84 0.072  0.068 .
-    ## Residuals          21     0.719  0.0342         0.815         
-    ## Total              24     0.882                 1.000         
+    ## Location            1     0.044  0.0443    1.24 0.049  0.268  
+    ## Rock.type           1     0.050  0.0496    1.39 0.055  0.193  
+    ## Location:Rock.type  1     0.060  0.0601    1.68 0.066  0.097 .
+    ## Residuals          21     0.751  0.0357         0.830         
+    ## Total              24     0.905                 1.000         
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -7856,9 +7812,9 @@ Unifrac_mat <- UniFrac(Ps_obj_filt,
     ## Terms added sequentially (first to last)
     ## 
     ##           Df SumsOfSqs MeanSqs F.Model    R2 Pr(>F)
-    ## Location   1     0.047  0.0469    1.29 0.053   0.26
-    ## Residuals 23     0.835  0.0363         0.947       
-    ## Total     24     0.882                 1.000
+    ## Location   1     0.044  0.0443    1.19 0.049   0.28
+    ## Residuals 23     0.860  0.0374         0.951       
+    ## Total     24     0.905                 1.000
 
 The difference between city and slope is significant based on the
 Morisita-Horn distances between OTUs but not based on UniFrac.
@@ -7960,7 +7916,7 @@ using Aligned Rank Transformed ANOVA test and a post-hoc estimated
 marginal means.
 
 ``` r
-Taxa_tests_phylum1 <- STAMPR2(Ps_obj_filt, vars2test = "Location", threshold = 0.001, outputfile = paste0(Proj_name, "_Location"))
+Taxa_tests_phylum1 <- STAMPR2(Ps_obj_filt, vars2test = "Location", threshold = 0.05, outputfile = paste0(Proj_name, "_Location"))
 
 pSTAMPR1 <- plotSTAMPR(Taxa_tests_phylum1, pair = "Slope - City")
 print(pSTAMPR1)
@@ -7969,7 +7925,7 @@ print(pSTAMPR1)
 ![](BRC_growth_rate_figures/STAMPR-1.svg)<!-- -->
 
 ``` r
-Taxa_tests_phylum2 <- STAMPR2(Ps_obj_filt, vars2test = c("Location", "Rock.type"), threshold = 0.001, outputfile = paste0(Proj_name, "_Location_Rock"))
+Taxa_tests_phylum2 <- STAMPR2(Ps_obj_filt, vars2test = c("Location", "Rock.type"), threshold = 0.05, outputfile = paste0(Proj_name, "_Location_Rock"))
 
 pSTAMPR2 <- plotSTAMPR(Taxa_tests_phylum2, pair = "Slope:Chalk - City:Chalk")
 print(pSTAMPR2)
@@ -8132,7 +8088,7 @@ ShivSClk5S18
 
 <td style="text-align:right;">
 
-0.01
+0.00
 
 </td>
 
@@ -8180,7 +8136,7 @@ ShivSLimek3S19
 
 <td style="text-align:right;">
 
-14.27
+0.11
 
 </td>
 
@@ -8196,7 +8152,7 @@ ShivSLimek4S20
 
 <td style="text-align:right;">
 
-11.48
+0.24
 
 </td>
 
@@ -8260,7 +8216,7 @@ SlpClk2S4
 
 <td style="text-align:right;">
 
-0.04
+0.03
 
 </td>
 
@@ -8276,7 +8232,7 @@ SlpClk3S5
 
 <td style="text-align:right;">
 
-0.04
+0.03
 
 </td>
 
@@ -8292,7 +8248,7 @@ SlpClk4S6
 
 <td style="text-align:right;">
 
-0.03
+0.01
 
 </td>
 
@@ -8356,7 +8312,7 @@ SlpClk8S10
 
 <td style="text-align:right;">
 
-0.03
+0.02
 
 </td>
 
@@ -8372,7 +8328,7 @@ SlpClk9S11
 
 <td style="text-align:right;">
 
-0.05
+0.03
 
 </td>
 
@@ -8404,7 +8360,7 @@ SlpLime2S2
 
 <td style="text-align:right;">
 
-0.04
+0.02
 
 </td>
 
@@ -8420,7 +8376,7 @@ SlpLime3S22
 
 <td style="text-align:right;">
 
-0.09
+0.07
 
 </td>
 
@@ -8535,7 +8491,7 @@ City:Limestone
 
 <td style="text-align:right;">
 
-4.31
+0.07
 
 </td>
 
@@ -8551,7 +8507,7 @@ Slope:Chalk
 
 <td style="text-align:right;">
 
-0.03
+0.02
 
 </td>
 
@@ -8567,7 +8523,7 @@ Slope:Limestone
 
 <td style="text-align:right;">
 
-0.07
+0.06
 
 </td>
 
@@ -8635,11 +8591,11 @@ Ps_obj_filt_GMPR_glom_rel_DF$Phylum %<>% as.character() # factor to char
 # group dataframe by Phylum, calculate median rel. abundance
 Ps_obj_filt_GMPR_glom_rel_DF %>%
   group_by(Phylum) %>%
-  summarise(median = median(Abundance)) ->
-  medians
+  summarise(mean = mean(Abundance)) ->
+  means
 
 # find Phyla whose median rel. abund. is less than 0.5%
-Rare_phyla0.005 <- medians[medians$median <= 0.005, ]$Phylum
+Rare_phyla0.005 <- means[means$mean <= 0.005, ]$Phylum
 
 # change their name to "Rare"
 Ps_obj_filt_GMPR_glom_rel_DF[Ps_obj_filt_GMPR_glom_rel_DF$Phylum %in% Rare_phyla0.005, ]$Phylum <- 'Rare'
@@ -8675,7 +8631,7 @@ da_Loc_intervals <- plot(da_Loc, level = "Class", data_only = T)
 which(is.na(da_Loc$p)) %>% names
 ```
 
-    ## [1] "OTU398" "OTU164" "OTU476" "OTU641" "OTU239" "OTU481" "OTU727" "OTU451" "OTU245"
+    ## [1] "OTU398" "OTU164" "OTU476" "OTU641" "OTU239" "OTU481" "OTU727" "OTU245"
 
 ``` r
 Ps_obj_filt %>%
@@ -8742,7 +8698,7 @@ which(is.na(da_Rock$p)) %>% names
 ```
 
     ##  [1] "OTU780" "OTU164" "OTU580" "OTU679" "OTU696" "OTU712" "OTU519" "OTU503" "OTU542"
-    ## [10] "OTU451" "OTU114" "OTU309" "OTU502" "OTU245" "OTU229"
+    ## [10] "OTU245" "OTU229"
 
 ``` r
 map(da_Rock$all_models,15) %>% 
@@ -8803,12 +8759,11 @@ which(is.na(da_Loc_exRock$p)) %>% names
 ```
 
     ##  [1] "OTU780" "OTU398" "OTU164" "OTU476" "OTU580" "OTU679" "OTU696" "OTU712" "OTU641"
-    ## [10] "OTU519" "OTU239" "OTU481" "OTU503" "OTU542" "OTU727" "OTU451" "OTU114" "OTU309"
-    ## [19] "OTU502" "OTU245" "OTU229"
+    ## [10] "OTU519" "OTU239" "OTU481" "OTU503" "OTU542" "OTU727" "OTU245" "OTU229"
 
 ``` r
-map(da_Loc_exRock$all_models,15) %>% 
-  map(.,2) %>% 
+map(da_Loc_exRock$all_models, 15) %>% 
+  map(., 2) %>% 
   unlist %>%  # grab all mu.LocationSlope Estimates (differences in estimated population relative abundance)
   bind_cols(OTU = taxa_names(Ps_obj_filt), 
             tax_table(Ps_obj_filt), 
@@ -8861,7 +8816,7 @@ mod260_Loc_rock <- bbdml(formula = OTU97 ~ Location*Rock.type,
 lrtest(mod_null = mod260, mod = mod260_Loc)
 ```
 
-    ## [1] 0.0029
+    ## [1] 0.004013869
 
 ``` r
 # lrtest(mod_null = mod260_Loc, mod = mod260_Loc_rock)
@@ -8874,22 +8829,22 @@ summary(mod260_Loc)
     ## 
     ## 
     ## Coefficients associated with abundance:
-    ##             Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)   -8.562      0.239  -35.78   <2e-16 ***
-    ## Location1      0.676      0.239    2.82     0.01 *  
+    ##              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   -7.8860     0.4137 -19.060  9.8e-15 ***
+    ## LocationCity  -1.3161     0.4812  -2.735   0.0124 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
     ## 
     ## Coefficients associated with dispersion:
-    ##             Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)   -8.535      0.409  -20.89  1.6e-15 ***
-    ## Location1      1.427      0.409    3.49   0.0022 ** 
+    ##              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   -7.1074     0.5436 -13.075 1.47e-11 ***
+    ## LocationCity  -2.7580     0.8110  -3.401  0.00269 ** 
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
     ## 
-    ## Log-likelihood: -80.58
+    ## Log-likelihood: -80.859
 
 ``` r
 plot(mod260_Loc, color = "Location", shape = "Rock.type") # add total = TRUE for total counts (i.e. not relative abundance)
