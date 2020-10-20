@@ -1809,12 +1809,12 @@ print(p_ord_phylo)
 #### Test differences between samples on the phylum level
 STAMPR analysis of the differences of each phylum between locations using Aligned Rank Transformed ANOVA test and a post-hoc estimated marginal means.
 ```{r STAMPR, fig.width=12, fig.height=6, cache=T, results="hide"}
-Taxa_tests_phylum1 <- STAMPR2(Ps_obj_filt, vars2test = "Location", threshold = 0.001, outputfile = paste0(Proj_name, "_Location"))
+Taxa_tests_phylum1 <- STAMPR2(Ps_obj_filt, vars2test = "Location", threshold = 0.05, outputfile = paste0(Proj_name, "_Location"))
 
 pSTAMPR1 <- plotSTAMPR(Taxa_tests_phylum1, pair = "Slope - City")
 print(pSTAMPR1)
 
-Taxa_tests_phylum2 <- STAMPR2(Ps_obj_filt, vars2test = c("Location", "Rock.type"), threshold = 0.001, outputfile = paste0(Proj_name, "_Location_Rock"))
+Taxa_tests_phylum2 <- STAMPR2(Ps_obj_filt, vars2test = c("Location", "Rock.type"), threshold = 0.05, outputfile = paste0(Proj_name, "_Location_Rock"))
 
 pSTAMPR2 <- plotSTAMPR(Taxa_tests_phylum2, pair = "Slope:Chalk - City:Chalk")
 print(pSTAMPR2)
@@ -1934,11 +1934,11 @@ Ps_obj_filt_GMPR_glom_rel_DF$Phylum %<>% as.character() # factor to char
 # group dataframe by Phylum, calculate median rel. abundance
 Ps_obj_filt_GMPR_glom_rel_DF %>%
   group_by(Phylum) %>%
-  summarise(median = median(Abundance)) ->
-  medians
+  summarise(mean = mean(Abundance)) ->
+  means
 
 # find Phyla whose median rel. abund. is less than 0.5%
-Rare_phyla0.005 <- medians[medians$median <= 0.005, ]$Phylum
+Rare_phyla0.005 <- means[means$mean <= 0.005, ]$Phylum
 
 # change their name to "Rare"
 Ps_obj_filt_GMPR_glom_rel_DF[Ps_obj_filt_GMPR_glom_rel_DF$Phylum %in% Rare_phyla0.005, ]$Phylum <- 'Rare'
@@ -2081,8 +2081,8 @@ da_Loc_exRock <- differentialTest(formula = ~ Location + Rock.type,
 da_Loc_exRock_intervals <- plot(da_Loc_exRock, level = "Class", data_only = TRUE)
 
 which(is.na(da_Loc_exRock$p)) %>% names
-map(da_Loc_exRock$all_models,15) %>% 
-  map(.,2) %>% 
+map(da_Loc_exRock$all_models, 15) %>% 
+  map(., 2) %>% 
   unlist %>%  # grab all mu.LocationSlope Estimates (differences in estimated population relative abundance)
   bind_cols(OTU = taxa_names(Ps_obj_filt), 
             tax_table(Ps_obj_filt), 
@@ -2137,7 +2137,7 @@ plot(mod260_Loc, color = "Location", shape = "Rock.type") # add total = TRUE for
 ```
 
 ### Compose figures
-```{r Figures}
+```{r Figures, cache=F}
 composite_plot <- ((p_alpha + p_taxa_box +  plot_layout(widths = c(1, 2))) /(p_ord + pSTAMPR1) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)))
 
 plot_file <- "./Results/Microbiome_1"
