@@ -285,9 +285,7 @@ TestAlphaV3 <- function(data2test = Richness_Diversity_long_sub,
                         response_name = "Estimate",
                         factor_names = c("Location", "Rock.type"),
                         boxcox.trans = FALSE) {
-  # replaced SRH test with ranked ANOVA if Leven's is significant
-  # art only works on balanced designs!!
-  # TODO: plot resid for mod_art
+
   
     require(dplyr)
       mod_lm <-
@@ -401,7 +399,7 @@ PairwiseAdonis <- function(x, factors, sim.function = "vegdist", sim.method = "h
 
 STAMPR2 <- function(physeq_obj,
                     tax_rank = "Phylum",
-                    vars2test = c("Vegetation", "Elevation..m."),
+                    vars2test = c("Location", "Rock.type"),
                     threshold = 0.005,
                     outputfile = "STAMPR_output") {
     # run a STAMP-like analysis: compare relative abundance differences using two-way analysis, then run a post-hoc test and correct for multiple comparison. This is an extended and updated version for Parks, D. H., Tyson, G. W., Hugenholtz, P., and Beiko, R. G. (2014). STAMP: statistical analysis of taxonomic and functional profiles. Bioinformatics 30, 3123–3124. doi:10.1093/bioinformatics/btu494.)
@@ -429,12 +427,12 @@ STAMPR2 <- function(physeq_obj,
                             NArm = TRUE) # agglomerate taxa using taxonomy
 
     
-    # Test only abundant taxa: group dataframe by rank, calculate median rel. abundance and keep only taxa above threshold
+    # Test only abundant taxa: group dataframe by rank, calculate total rel. abundance per phylum and keep only taxa above threshold
     physeq_glom_rel %>%
       psmelt(.) %>%
       group_by(!!sym(tax_rank)) %>%
-      summarise(median = median(Abundance)) %>%
-      filter(median >= threshold) %>%
+      summarise(tot_abundance = sum(Abundance)) %>%
+      filter(tot_abundance >= threshold) %>%
       pull(1) %>%
       as.character() ->
       Taxa2test
@@ -1209,7 +1207,7 @@ sample_data(Ps_obj)$Location %<>% fct_relevel("Slope", "City")
 
 Remove un- and mis-classified sequences, chloroplasts and mitochondria
 ```{r remove samples, cache=T}
-domains2remove <- c("", "Eukaryota", "Unclassified")
+domains2remove <- c("", "Archaea", "Eukaryota", "Unclassified")
 classes2remove <- c("Chloroplast")
 families2remove <- c("Mitochondria")
 Ps_obj_filt <- subset_taxa(Ps_obj, !is.na(Phylum) &
