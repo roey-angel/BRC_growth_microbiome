@@ -1,6 +1,6 @@
 How fast does biological rock crust grow?
 ================
-20 October, 2020
+21 October, 2020
 
   - [Setting general parameters:](#setting-general-parameters)
   - [Description](#description)
@@ -7947,17 +7947,17 @@ Ps_obj_filt_GMPR_glom_DF <- speedyseq::psmelt(Ps_obj_filt_GMPR_glom)
 Ps_obj_filt_GMPR_glom_DF$Phylum %<>% as.character()
 # Ps_obj_filt3_glom_DF %<>% mutate(Species = fct_relevel(Species, "NA", after = Inf))
 
-# group dataframe by Phylum, calculate median rel. abundance
+# group dataframe by Phylum, calculate mean rel. abundance
 Ps_obj_filt_GMPR_glom_DF %>%
   group_by(Phylum) %>%
-  summarise(median = median(Abundance)) ->
-  medians
+  summarise(mean = mean(Abundance)) ->
+  means
 
-# find Phyla whose rel. abund. is less than 1%
-Rare_phyla0.01 <- medians[medians$median <= 0.01, ]$Phylum
+# find Phyla whose rel. abund. is less than 5%
+Rare_phyla0.05 <- means[means$mean <= 0.05, ]$Phylum
 
 # change their name to "Rare"
-Ps_obj_filt_GMPR_glom_DF[Ps_obj_filt_GMPR_glom_DF$Phylum %in% Rare_phyla0.01, ]$Phylum <- 'Rare'
+Ps_obj_filt_GMPR_glom_DF[Ps_obj_filt_GMPR_glom_DF$Phylum %in% Rare_phyla0.05, ]$Phylum <- 'Rare'
 # re-group
 Ps_obj_filt_GMPR_glom_DF %>%
   group_by(Sample, Phylum, Location, Rock.type, Location.rock) %>%
@@ -8588,13 +8588,13 @@ Ps_obj_filt_GMPR_glom_rel <- transform_sample_counts(Ps_obj_filt_GMPR_glom, func
 Ps_obj_filt_GMPR_glom_rel_DF <- speedyseq::psmelt(Ps_obj_filt_GMPR_glom_rel) # generate a df
 Ps_obj_filt_GMPR_glom_rel_DF$Phylum %<>% as.character() # factor to char
 
-# group dataframe by Phylum, calculate median rel. abundance
+# group dataframe by Phylum, calculate mean rel. abundance
 Ps_obj_filt_GMPR_glom_rel_DF %>%
   group_by(Phylum) %>%
   summarise(mean = mean(Abundance)) ->
   means
 
-# find Phyla whose median rel. abund. is less than 0.5%
+# find Phyla whose mean rel. abund. is less than 0.5%
 Rare_phyla0.005 <- means[means$mean <= 0.005, ]$Phylum
 
 # change their name to "Rare"
