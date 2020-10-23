@@ -174,7 +174,7 @@ PlotLmResid <- function(lm.df, which = c(1:6), mfrow = c(3, 2)){
   
   # residuals vs fitted
   g1 <- ggplot(lm.df, aes(.fitted, .resid)) +
-    geom_point()  +
+    geom_point2()  +
     smoother + 
     geom_hline(yintercept = 0, linetype = 2, size = .2) +
     scale_x_continuous("Fitted Values") +
@@ -195,7 +195,7 @@ PlotLmResid <- function(lm.df, which = c(1:6), mfrow = c(3, 2)){
  
   # scale-location
   g3 <- ggplot(lm.df, aes(.fitted, sqrt(abs(.stdresid)))) +
-    geom_point() +
+    geom_point2() +
     smoother +
     scale_x_continuous("Fitted Values") +
     scale_y_continuous("Root of Standardized Residuals") +
@@ -203,7 +203,7 @@ PlotLmResid <- function(lm.df, which = c(1:6), mfrow = c(3, 2)){
  
   # residuals vs leverage
   g4 <- ggplot(lm.df, aes(factors, .stdresid)) +
-    geom_point() +
+    geom_point2() +
     smoother +
     geom_hline(yintercept = 0, linetype = 2, size = .2) +
     scale_x_continuous("Factor Level Combinations") +
@@ -212,14 +212,14 @@ PlotLmResid <- function(lm.df, which = c(1:6), mfrow = c(3, 2)){
  
 #   # cook's distance
 #   g5 <-  ggplot(lm.df, aes(rows, .cooksd, ymin=0, ymax=.cooksd)) +
-#     geom_point() + geom_linerange() +
+#     geom_point2() + geom_linerange() +
 #     scale_x_continuous("Observation Number") +
 #     scale_y_continuous("Cook's distance") +
 #     labs(title="Cook's Distance")  
   
   # cooksd vs leverage
   g5 <- ggplot(lm.df, aes(factors, .cooksd)) +
-    geom_point() +
+    geom_point2() +
     smoother +
     scale_x_continuous("Factor Level Combinations") +
     scale_y_continuous("Cook's distance") +
@@ -731,7 +731,7 @@ plotSTAMPR <- function(STAMPR_output = Taxa_tests_phylum1, pair = "City - Slope"
                   width = 0.3,
                   alpha = 2/3
     ) +
-    geom_point(data = STAMPR_df,
+    geom_point2(data = STAMPR_df,
                aes(!! sym(tax_level), 
                    y = `Estimate diff.`, 
                    colour = Higher),
@@ -945,7 +945,7 @@ Ps_obj_df <- Ps_obj_df[order(Ps_obj_df$Library.size), ]
 Ps_obj_df$Index <- seq(nrow(Ps_obj_df))
 ggplot(data = Ps_obj_df, 
        aes(x = Index, y = Library.size, color = Location.rock)) + 
-  geom_point(size = 4) + 
+  geom_point2(size = 4) + 
   scale_colour_manual(values = ggpomological:::pomological_palette[c(2, 1, 9, 3)], name = "Location.rock")
 summary(sample_sums(Ps_obj_filt))
 summary(taxa_sums(Ps_obj_filt))
@@ -1004,7 +1004,7 @@ ggplot(prevdf_phylum_filt,
   # Include a guess for parameter
   geom_hline(yintercept = 0.05,
              alpha = 0.5,
-             linetype = 2) + geom_point(size = 2, alpha = 0.7) +
+             linetype = 2) + geom_point2(size = 2, alpha = 0.7) +
   scale_x_log10() +  xlab("Total Abundance") + ylab("Prevalence [Frac. Samples]") +
   facet_wrap( ~ Phylum) + theme(legend.position = "none")
 ```
@@ -1026,7 +1026,7 @@ ggplot(prevdf_order_filt2,
   # Include a guess for parameter
   geom_hline(yintercept = 0.05,
              alpha = 0.5,
-             linetype = 2) + geom_point(size = 2, alpha = 0.7) +
+             linetype = 2) + geom_point2(size = 2, alpha = 0.7) +
   scale_x_log10() +  xlab("Total Abundance") + ylab("Prevalence [Frac. Samples]") +
   facet_wrap( ~ Order) + theme(legend.position = "none")
 ```
@@ -1473,7 +1473,7 @@ p_ord <- ggplot(ord_df,
     # linetype = 2,
     inherit.aes = FALSE
   ) +
-  geom_point(size = 4, alpha = 2 / 3) +
+  geom_point2(size = 4, alpha = 2 / 3) +
   guides(colour = guide_legend(title = "Location"), shape = guide_legend(title = "Rock.type")) +
   scale_colour_manual(values = Gradient.colours) +
   scale_fill_manual(values = Gradient.colours, guide = "none") +
@@ -1515,7 +1515,7 @@ p_ord_phylo <- ggplot(ord_df,
     # linetype = 2,
     inherit.aes = FALSE
   ) +
-  geom_point(size = 4, alpha = 2 / 3) +
+  geom_point2(size = 4, alpha = 2 / 3) +
   theme_bw(base_size = 14) +
   guides(colour = guide_legend(title = "Location"), shape = guide_legend(title = "Rock.type")) +
   scale_colour_manual(values = Gradient.colours) +
@@ -1618,7 +1618,7 @@ Ps_obj_filt_GMPR_glom_DF_2plot$Phylum %<>%
 p_taxa_box <-
   ggplot(Ps_obj_filt_GMPR_glom_DF_2plot, aes(x = Phylum, y = (Abundance))) +
   geom_boxplot(aes(group = interaction(Phylum, Location)), position = position_dodge(width = 0.9), fatten = 1) +
-  geom_point(
+  geom_point2(
     aes(colour = Rock.type),
     position = position_jitterdodge(dodge.width = 1),
     alpha = 1 / 2,

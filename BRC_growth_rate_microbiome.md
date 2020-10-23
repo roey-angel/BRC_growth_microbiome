@@ -137,7 +137,7 @@ Ps_obj_df <- Ps_obj_df[order(Ps_obj_df$Library.size), ]
 Ps_obj_df$Index <- seq(nrow(Ps_obj_df))
 ggplot(data = Ps_obj_df, 
        aes(x = Index, y = Library.size, color = Location.rock)) + 
-  geom_point(size = 4) + 
+  geom_point2(size = 4) + 
   scale_colour_manual(values = ggpomological:::pomological_palette[c(2, 1, 9, 3)], name = "Location.rock")
 ```
 
@@ -2456,7 +2456,7 @@ ggplot(prevdf_phylum_filt,
   # Include a guess for parameter
   geom_hline(yintercept = 0.05,
              alpha = 0.5,
-             linetype = 2) + geom_point(size = 2, alpha = 0.7) +
+             linetype = 2) + geom_point2(size = 2, alpha = 0.7) +
   scale_x_log10() +  xlab("Total Abundance") + ylab("Prevalence [Frac. Samples]") +
   facet_wrap( ~ Phylum) + theme(legend.position = "none")
 ```
@@ -2481,7 +2481,7 @@ ggplot(prevdf_order_filt2,
   # Include a guess for parameter
   geom_hline(yintercept = 0.05,
              alpha = 0.5,
-             linetype = 2) + geom_point(size = 2, alpha = 0.7) +
+             linetype = 2) + geom_point2(size = 2, alpha = 0.7) +
   scale_x_log10() +  xlab("Total Abundance") + ylab("Prevalence [Frac. Samples]") +
   facet_wrap( ~ Order) + theme(legend.position = "none")
 ```
@@ -7851,7 +7851,7 @@ p_ord <- ggplot(ord_df,
     # linetype = 2,
     inherit.aes = FALSE
   ) +
-  geom_point(size = 4, alpha = 2 / 3) +
+  geom_point2(size = 4, alpha = 2 / 3) +
   guides(colour = guide_legend(title = "Location"), shape = guide_legend(title = "Rock.type")) +
   scale_colour_manual(values = Gradient.colours) +
   scale_fill_manual(values = Gradient.colours, guide = "none") +
@@ -7895,7 +7895,7 @@ p_ord_phylo <- ggplot(ord_df,
     # linetype = 2,
     inherit.aes = FALSE
   ) +
-  geom_point(size = 4, alpha = 2 / 3) +
+  geom_point2(size = 4, alpha = 2 / 3) +
   theme_bw(base_size = 14) +
   guides(colour = guide_legend(title = "Location"), shape = guide_legend(title = "Rock.type")) +
   scale_colour_manual(values = Gradient.colours) +
@@ -8549,7 +8549,7 @@ Ps_obj_filt_GMPR_glom_DF_2plot$Phylum %<>%
 p_taxa_box <-
   ggplot(Ps_obj_filt_GMPR_glom_DF_2plot, aes(x = Phylum, y = (Abundance))) +
   geom_boxplot(aes(group = interaction(Phylum, Location)), position = position_dodge(width = 0.9), fatten = 1) +
-  geom_point(
+  geom_point2(
     aes(colour = Rock.type),
     position = position_jitterdodge(dodge.width = 1),
     alpha = 1 / 2,
@@ -8791,7 +8791,7 @@ mod260_Loc_rock <- bbdml(formula = OTU97 ~ Location*Rock.type,
 lrtest(mod_null = mod260, mod = mod260_Loc)
 ```
 
-    ## [1] 0.004013869
+    ## [1] 0.00401
 
 ``` r
 # lrtest(mod_null = mod260_Loc, mod = mod260_Loc_rock)
@@ -8804,22 +8804,22 @@ summary(mod260_Loc)
     ## 
     ## 
     ## Coefficients associated with abundance:
-    ##              Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)   -7.8860     0.4137 -19.060  9.8e-15 ***
-    ## LocationCity  -1.3161     0.4812  -2.735   0.0124 *  
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   -8.544      0.241  -35.51   <2e-16 ***
+    ## Location1      0.658      0.241    2.73    0.012 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
     ## 
     ## Coefficients associated with dispersion:
-    ##              Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)   -7.1074     0.5436 -13.075 1.47e-11 ***
-    ## LocationCity  -2.7580     0.8110  -3.401  0.00269 ** 
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   -8.486      0.406   -20.9  1.5e-15 ***
+    ## Location1      1.379      0.406     3.4   0.0027 ** 
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
     ## 
-    ## Log-likelihood: -80.859
+    ## Log-likelihood: -80.86
 
 ``` r
 plot(mod260_Loc, color = "Location", shape = "Rock.type") # add total = TRUE for total counts (i.e. not relative abundance)
