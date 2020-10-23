@@ -1,6 +1,6 @@
 How fast does biological rock crust grow?
 ================
-21 October, 2020
+23 October, 2020
 
   - [Setting general parameters:](#setting-general-parameters)
   - [Description](#description)
@@ -7938,23 +7938,25 @@ print(pSTAMPR2)
 Agglomerate data and tag rare taxa
 
 ``` r
-Ps_obj_filt_GMPR_ra <- transform_sample_counts(Ps_obj_filt_GMPR, function(x){x / sum(x)} * 100)
+Ps_obj_filt_GMPR %>% 
+  transform_sample_counts(., function(x){x / sum(x)} * 100) %>% 
+  tax_glom(., 
+           "Phylum",
+           NArm = TRUE) ->
+  Ps_obj_filt_GMPR_glom
 
-Ps_obj_filt_GMPR_glom <- tax_glom(Ps_obj_filt_GMPR_ra, 
-                             "Phylum", 
-                             NArm = TRUE)
 Ps_obj_filt_GMPR_glom_DF <- speedyseq::psmelt(Ps_obj_filt_GMPR_glom)
 Ps_obj_filt_GMPR_glom_DF$Phylum %<>% as.character()
 # Ps_obj_filt3_glom_DF %<>% mutate(Species = fct_relevel(Species, "NA", after = Inf))
 
-# group dataframe by Phylum, calculate mean rel. abundance
+# group dataframe by Phylum, calculate sum rel. abundance
 Ps_obj_filt_GMPR_glom_DF %>%
   group_by(Phylum) %>%
-  summarise(mean = mean(Abundance)) ->
-  means
+  summarise(Sum = sum(Abundance) / nsamples(Ps_obj_filt_GMPR_glom) ) ->
+  Sums
 
 # find Phyla whose rel. abund. is less than 5%
-Rare_phyla0.05 <- means[means$mean <= 0.05, ]$Phylum
+Rare_phyla0.05 <- Sums[Sums$Sum <= 0.05, ]$Phylum
 
 # change their name to "Rare"
 Ps_obj_filt_GMPR_glom_DF[Ps_obj_filt_GMPR_glom_DF$Phylum %in% Rare_phyla0.05, ]$Phylum <- 'Rare'
@@ -8588,17 +8590,17 @@ Ps_obj_filt_GMPR_glom_rel <- transform_sample_counts(Ps_obj_filt_GMPR_glom, func
 Ps_obj_filt_GMPR_glom_rel_DF <- speedyseq::psmelt(Ps_obj_filt_GMPR_glom_rel) # generate a df
 Ps_obj_filt_GMPR_glom_rel_DF$Phylum %<>% as.character() # factor to char
 
-# group dataframe by Phylum, calculate mean rel. abundance
+# group dataframe by Phylum, calculate sum rel. abundance
 Ps_obj_filt_GMPR_glom_rel_DF %>%
   group_by(Phylum) %>%
-  summarise(mean = mean(Abundance)) ->
-  means
+  summarise(Sum = sum(Abundance) / nsamples(Ps_obj_filt_GMPR_glom) ) ->
+  Sums
 
 # find Phyla whose mean rel. abund. is less than 0.5%
-Rare_phyla0.005 <- means[means$mean <= 0.005, ]$Phylum
+Rare_phyla0.05 <- Sums[Sums$Sum <= 0.05, ]$Phylum
 
 # change their name to "Rare"
-Ps_obj_filt_GMPR_glom_rel_DF[Ps_obj_filt_GMPR_glom_rel_DF$Phylum %in% Rare_phyla0.005, ]$Phylum <- 'Rare'
+Ps_obj_filt_GMPR_glom_rel_DF[Ps_obj_filt_GMPR_glom_rel_DF$Phylum %in% Rare_phyla0.05, "Phylum"] <- 'Rare' 
 
 # re-group
 Ps_obj_filt_GMPR_glom_rel_DF %>%
@@ -8656,22 +8658,13 @@ map(da_Loc$all_models,15) %>%
 
 da_Loc_df %<>% rows_update(., tibble(ymin = da_Loc_intervals$xmin, OTU = da_Loc$significant_taxa), by = "OTU")
 da_Loc_df %<>% rows_update(., tibble(ymax = da_Loc_intervals$xmax, OTU = da_Loc$significant_taxa), by = "OTU")
-da_Loc_df[da_Loc_df$Phylum %in% Rare_phyla0.005, "Phylum"] <- 'Rare' # rare_phyla is
+da_Loc_df[da_Loc_df$Phylum %in% Rare_phyla0.05, "Phylum"] <- 'Rare' # rare_phyla is
 
 p_corncob_loc <- GGPlotCorncob(da_Loc_df, OTU_labels = FALSE, Taxa = "Phylum", Y_val = "Differential abundance", sig_level = 0.05, Rank = Taxa_rank)
 
 corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Loc_df$`Differential abundance` > 0 &  da_Loc_df$Significance == "Pass"), " ⬇", sum(da_Loc_df$`Differential abundance` < 0 &  da_Loc_df$Significance == "Pass"), " (", nrow(da_Loc_df), ")")))
 
 p_corncob_loc <- p_corncob_loc +
-  geom_text(
-    data    = corncob_summary,
-    mapping = aes(x = Inf, y = Inf, label = Label),
-    hjust   = 1.1,
-    vjust   = 1.6
-  ) +
-  scale_size_continuous(name = "Mean abundance (%)",
-                        limits = c(min(da_Loc_df$`Mean abundance (%)`), max(da_Loc_df$`Mean abundance (%)`))
-  ) + 
   labs(title = paste(comparison_string, collapse = " - ")) +
   coord_cartesian(ylim = c(-15, 15))
 print(p_corncob_loc)
@@ -8716,22 +8709,13 @@ map(da_Rock$all_models,15) %>%
 
 da_Rock_df %<>% rows_update(., tibble(ymin = da_Rock_intervals$xmin, OTU = da_Rock$significant_taxa), by = "OTU")
 da_Rock_df %<>% rows_update(., tibble(ymax = da_Rock_intervals$xmax, OTU = da_Rock$significant_taxa), by = "OTU")
-da_Rock_df[da_Rock_df$Phylum %in% Rare_phyla0.005, "Phylum"] <- 'Rare' # rare_phyla is
+da_Rock_df[da_Rock_df$Phylum %in% Rare_phyla0.05, "Phylum"] <- 'Rare' # rare_phyla is
 
 p_corncob_rock <- GGPlotCorncob(da_Rock_df, OTU_labels = FALSE, Taxa = "Phylum", Y_val = "Differential abundance", sig_level = 0.05, Rank = Taxa_rank)
 
 corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Rock_df$`Differential abundance` > 0 &  da_Rock_df$Significance == "Pass"), " ⬇", sum(da_Rock_df$`Differential abundance` < 0 &  da_Rock_df$Significance == "Pass"), " (", nrow(da_Rock_df), ")")))
 
 p_corncob_rock <- p_corncob_rock +
-  geom_text(
-    data    = corncob_summary,
-    mapping = aes(x = Inf, y = Inf, label = Label),
-    hjust   = 1.1,
-    vjust   = 1.6
-  ) +
-  scale_size_continuous(name = "Mean abundance (%)",
-                        limits = c(min(da_Rock_df$`Mean abundance (%)`), max(da_Rock_df$`Mean abundance (%)`))
-  ) + 
   labs(title = paste(comparison_string, collapse = " - ")) +
   coord_cartesian(ylim = c(-15, 15))
 print(p_corncob_rock)
@@ -8777,22 +8761,13 @@ map(da_Loc_exRock$all_models, 15) %>%
 
 da_Loc_exRock_df %<>% rows_update(., tibble(ymin = da_Loc_exRock_intervals$xmin, OTU = da_Loc_exRock$significant_taxa), by = "OTU")
 da_Loc_exRock_df %<>% rows_update(., tibble(ymax = da_Loc_exRock_intervals$xmax, OTU = da_Loc_exRock$significant_taxa), by = "OTU")
-da_Loc_exRock_df[da_Loc_exRock_df$Phylum %in% Rare_phyla0.005, "Phylum"] <- 'Rare' # rare_phyla is
+da_Loc_exRock_df[da_Loc_exRock_df$Phylum %in% Rare_phyla0.05, "Phylum"] <- 'Rare' # rare_phyla is
 
 p_corncob_locExroc <- GGPlotCorncob(da_Loc_exRock_df, OTU_labels = FALSE, Taxa = "Phylum", Y_val = "Differential abundance", sig_level = 0.05, Rank = Taxa_rank)
 
 corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Loc_exRock_df$`Differential abundance` > 0 &  da_Loc_exRock_df$Significance == "Pass"), " ⬇", sum(da_Loc_exRock_df$`Differential abundance` < 0 &  da_Loc_exRock_df$Significance == "Pass"), " (", nrow(da_Loc_exRock_df), ")")))
 
 p_corncob_locExroc <- p_corncob_locExroc +
-  geom_text(
-    data    = corncob_summary,
-    mapping = aes(x = Inf, y = Inf, label = Label),
-    hjust   = 1.1,
-    vjust   = 1.6
-  ) +
-  scale_size_continuous(name = "Mean abundance (%)",
-                        limits = c(min(da_Loc_exRock_df$`Mean abundance (%)`), max(da_Loc_exRock_df$`Mean abundance (%)`))
-  ) + 
   labs(title = paste(comparison_string, collapse = " - ")) +
   coord_cartesian(ylim = c(-15, 15))
 print(p_corncob_locExroc)
