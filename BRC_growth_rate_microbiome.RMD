@@ -1191,8 +1191,6 @@ Richness_Diversity_long %<>%
         sample_data(Ps_obj_filt))
 
 # S Obs
-data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.", ] 
-
 (mod_obsS <- TestAlphaV3(filter(Richness_Diversity_long, Metric == "S obs.")))
 # Post-hoc test
 marginal <- emmeans(mod_obsS,
