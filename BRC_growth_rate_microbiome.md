@@ -1,38 +1,38 @@
 How fast does biological rock crust grow?
 ================
-23 October, 2020
+08 February, 2021
 
-  - [Setting general parameters:](#setting-general-parameters)
-  - [Description](#description)
-      - [Load data](#load-data)
-      - [Inspect library size and number of
+-   [Setting general parameters:](#setting-general-parameters)
+-   [Description](#description)
+    -   [Load data](#load-data)
+    -   [Inspect library size and number of
         OTU](#inspect-library-size-and-number-of-otu)
-      - [Explore the prevalence of different taxa in the
+    -   [Explore the prevalence of different taxa in the
         database](#explore-the-prevalence-of-different-taxa-in-the-database)
-          - [Plot general prevalence features of the
+        -   [Plot general prevalence features of the
             phyla](#plot-general-prevalence-features-of-the-phyla)
-          - [Plot general prevalence features of the top 20
+        -   [Plot general prevalence features of the top 20
             orders](#plot-general-prevalence-features-of-the-top-20-orders)
-          - [Unsupervised filtering by
+        -   [Unsupervised filtering by
             prevalence](#unsupervised-filtering-by-prevalence)
-      - [Exploring the dataset
+    -   [Exploring the dataset
         features](#exploring-the-dataset-features)
-      - [Alpha diversity](#alpha-diversity)
-          - [Calculate and plot alpha diversity
+    -   [Alpha diversity](#alpha-diversity)
+        -   [Calculate and plot alpha diversity
             metrics](#calculate-and-plot-alpha-diversity-metrics)
-          - [Test the differences in alpha
+        -   [Test the differences in alpha
             diversity.](#test-the-differences-in-alpha-diversity.)
-          - [Plot all alpha diversity metrics
+        -   [Plot all alpha diversity metrics
             together](#plot-all-alpha-diversity-metrics-together)
-      - [Beta diversity](#beta-diversity)
-          - [Calculate ordinations](#calculate-ordinations)
-          - [Test differences between samples on the phylum
+    -   [Beta diversity](#beta-diversity)
+        -   [Calculate ordinations](#calculate-ordinations)
+        -   [Test differences between samples on the phylum
             level](#test-differences-between-samples-on-the-phylum-level)
-      - [Taxonmic distribution
+    -   [Taxonmic distribution
         analysis](#taxonmic-distribution-analysis)
-      - [Differential abundance models](#differential-abundance-models)
-      - [Compose figures](#compose-figures)
-      - [References](#references)
+    -   [Differential abundance models](#differential-abundance-models)
+    -   [Compose figures](#compose-figures)
+    -   [References](#references)
 
 ### Setting general parameters:
 
@@ -179,477 +179,241 @@ Prevalence_phylum_summary %>%
 ```
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Phylum
-
 </th>
-
 <th style="text-align:right;">
-
 Mean prevalence
-
 </th>
-
 <th style="text-align:right;">
-
 Sum prevalence
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 Acidobacteria
-
 </td>
-
 <td style="text-align:right;">
-
 11.7
-
 </td>
-
 <td style="text-align:right;">
-
 152
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Actinobacteria
-
 </td>
-
 <td style="text-align:right;">
-
 16.3
-
 </td>
-
 <td style="text-align:right;">
-
 3414
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Aquificae
-
 </td>
-
 <td style="text-align:right;">
-
 4.0
-
 </td>
-
 <td style="text-align:right;">
-
 12
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Armatimonadetes
-
 </td>
-
 <td style="text-align:right;">
-
 7.6
-
 </td>
-
 <td style="text-align:right;">
-
 76
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Bacteroidetes
-
 </td>
-
 <td style="text-align:right;">
-
 11.8
-
 </td>
-
 <td style="text-align:right;">
-
 1027
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Candidate\_division\_KB1
-
 </td>
-
 <td style="text-align:right;">
-
 8.0
-
 </td>
-
 <td style="text-align:right;">
-
 8
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Candidate\_division\_OD1
-
 </td>
-
 <td style="text-align:right;">
-
 4.0
-
 </td>
-
 <td style="text-align:right;">
-
 4
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Candidate\_division\_OP11
-
 </td>
-
 <td style="text-align:right;">
-
 4.5
-
 </td>
-
 <td style="text-align:right;">
-
 9
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Candidate\_division\_TM7
-
 </td>
-
 <td style="text-align:right;">
-
 7.9
-
 </td>
-
 <td style="text-align:right;">
-
 158
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Chloroflexi
-
 </td>
-
 <td style="text-align:right;">
-
 11.0
-
 </td>
-
 <td style="text-align:right;">
-
 1124
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Cyanobacteria
-
 </td>
-
 <td style="text-align:right;">
-
 14.9
-
 </td>
-
 <td style="text-align:right;">
-
 506
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Deinococcus-Thermus
-
 </td>
-
 <td style="text-align:right;">
-
 15.8
-
 </td>
-
 <td style="text-align:right;">
-
 174
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Firmicutes
-
 </td>
-
 <td style="text-align:right;">
-
 13.4
-
 </td>
-
 <td style="text-align:right;">
-
 214
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Gemmatimonadetes
-
 </td>
-
 <td style="text-align:right;">
-
 11.2
-
 </td>
-
 <td style="text-align:right;">
-
 617
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Nitrospirae
-
 </td>
-
 <td style="text-align:right;">
-
 6.0
-
 </td>
-
 <td style="text-align:right;">
-
 12
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Planctomycetes
-
 </td>
-
 <td style="text-align:right;">
-
 10.8
-
 </td>
-
 <td style="text-align:right;">
-
 140
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Proteobacteria
-
 </td>
-
 <td style="text-align:right;">
-
 14.4
-
 </td>
-
 <td style="text-align:right;">
-
 1817
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Tenericutes
-
 </td>
-
 <td style="text-align:right;">
-
 3.0
-
 </td>
-
 <td style="text-align:right;">
-
 3
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Verrucomicrobia
-
 </td>
-
 <td style="text-align:right;">
-
 23.0
-
 </td>
-
 <td style="text-align:right;">
-
 23
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 WCHB1-60
-
 </td>
-
 <td style="text-align:right;">
-
 7.0
-
 </td>
-
 <td style="text-align:right;">
-
 28
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 ``` r
@@ -665,1753 +429,879 @@ Prevalence_Order_summary %>%
 ```
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Order
-
 </th>
-
 <th style="text-align:right;">
-
 Mean prevalence
-
 </th>
-
 <th style="text-align:right;">
-
 Sum prevalence
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 AKIW781
-
 </td>
-
 <td style="text-align:right;">
-
 9.4
-
 </td>
-
 <td style="text-align:right;">
-
 198
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 AKYG1722
-
 </td>
-
 <td style="text-align:right;">
-
 10.7
-
 </td>
-
 <td style="text-align:right;">
-
 75
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 AT425-EubC11\_terrestrial\_group
-
 </td>
-
 <td style="text-align:right;">
-
 10.2
-
 </td>
-
 <td style="text-align:right;">
-
 378
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Acidimicrobiales
-
 </td>
-
 <td style="text-align:right;">
-
 14.7
-
 </td>
-
 <td style="text-align:right;">
-
 368
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Alteromonadales
-
 </td>
-
 <td style="text-align:right;">
-
 12.0
-
 </td>
-
 <td style="text-align:right;">
-
 12
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Aquificales
-
 </td>
-
 <td style="text-align:right;">
-
 4.0
-
 </td>
-
 <td style="text-align:right;">
-
 12
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Ardenticatenales
-
 </td>
-
 <td style="text-align:right;">
-
 8.0
-
 </td>
-
 <td style="text-align:right;">
-
 16
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 B103G10
-
 </td>
-
 <td style="text-align:right;">
-
 7.0
-
 </td>
-
 <td style="text-align:right;">
-
 7
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 BD2-11\_terrestrial\_group
-
 </td>
-
 <td style="text-align:right;">
-
 5.0
-
 </td>
-
 <td style="text-align:right;">
-
 5
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Bacillales
-
 </td>
-
 <td style="text-align:right;">
-
 13.7
-
 </td>
-
 <td style="text-align:right;">
-
 164
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Bacteroidales
-
 </td>
-
 <td style="text-align:right;">
-
 17.0
-
 </td>
-
 <td style="text-align:right;">
-
 17
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Bdellovibrionales
-
 </td>
-
 <td style="text-align:right;">
-
 8.0
-
 </td>
-
 <td style="text-align:right;">
-
 40
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Burkholderiales
-
 </td>
-
 <td style="text-align:right;">
-
 18.5
-
 </td>
-
 <td style="text-align:right;">
-
 204
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 C0119
-
 </td>
-
 <td style="text-align:right;">
-
 5.0
-
 </td>
-
 <td style="text-align:right;">
-
 5
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Caldilineales
-
 </td>
-
 <td style="text-align:right;">
-
 18.0
-
 </td>
-
 <td style="text-align:right;">
-
 18
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Campylobacterales
-
 </td>
-
 <td style="text-align:right;">
-
 6.0
-
 </td>
-
 <td style="text-align:right;">
-
 6
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Caulobacterales
-
 </td>
-
 <td style="text-align:right;">
-
 23.7
-
 </td>
-
 <td style="text-align:right;">
-
 71
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Chromatiales
-
 </td>
-
 <td style="text-align:right;">
-
 20.0
-
 </td>
-
 <td style="text-align:right;">
-
 20
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Chthoniobacterales
-
 </td>
-
 <td style="text-align:right;">
-
 23.0
-
 </td>
-
 <td style="text-align:right;">
-
 23
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Clostridiales
-
 </td>
-
 <td style="text-align:right;">
-
 6.5
-
 </td>
-
 <td style="text-align:right;">
-
 13
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Corynebacteriales
-
 </td>
-
 <td style="text-align:right;">
-
 8.0
-
 </td>
-
 <td style="text-align:right;">
-
 40
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Cytophagales
-
 </td>
-
 <td style="text-align:right;">
-
 11.8
-
 </td>
-
 <td style="text-align:right;">
-
 695
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Deinococcales
-
 </td>
-
 <td style="text-align:right;">
-
 15.1
-
 </td>
-
 <td style="text-align:right;">
-
 151
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Desulfovibrionales
-
 </td>
-
 <td style="text-align:right;">
-
 5.0
-
 </td>
-
 <td style="text-align:right;">
-
 5
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 E6aD10
-
 </td>
-
 <td style="text-align:right;">
-
 11.0
-
 </td>
-
 <td style="text-align:right;">
-
 11
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 EMP-G18
-
 </td>
-
 <td style="text-align:right;">
-
 3.0
-
 </td>
-
 <td style="text-align:right;">
-
 3
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Enterobacteriales
-
 </td>
-
 <td style="text-align:right;">
-
 22.0
-
 </td>
-
 <td style="text-align:right;">
-
 44
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Euzebyales
-
 </td>
-
 <td style="text-align:right;">
-
 13.5
-
 </td>
-
 <td style="text-align:right;">
-
 202
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Flavobacteriales
-
 </td>
-
 <td style="text-align:right;">
-
 12.7
-
 </td>
-
 <td style="text-align:right;">
-
 38
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Frankiales
-
 </td>
-
 <td style="text-align:right;">
-
 20.9
-
 </td>
-
 <td style="text-align:right;">
-
 356
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Gaiellales
-
 </td>
-
 <td style="text-align:right;">
-
 10.4
-
 </td>
-
 <td style="text-align:right;">
-
 94
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Gemmatimonadales
-
 </td>
-
 <td style="text-align:right;">
-
 14.3
-
 </td>
-
 <td style="text-align:right;">
-
 214
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 JG30-KF-CM45
-
 </td>
-
 <td style="text-align:right;">
-
 13.0
-
 </td>
-
 <td style="text-align:right;">
-
 468
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Kineosporiales
-
 </td>
-
 <td style="text-align:right;">
-
 20.2
-
 </td>
-
 <td style="text-align:right;">
-
 121
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Lactobacillales
-
 </td>
-
 <td style="text-align:right;">
-
 18.5
-
 </td>
-
 <td style="text-align:right;">
-
 37
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Micrococcales
-
 </td>
-
 <td style="text-align:right;">
-
 18.0
-
 </td>
-
 <td style="text-align:right;">
-
 198
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Micromonosporales
-
 </td>
-
 <td style="text-align:right;">
-
 19.5
-
 </td>
-
 <td style="text-align:right;">
-
 39
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Myxococcales
-
 </td>
-
 <td style="text-align:right;">
-
 10.2
-
 </td>
-
 <td style="text-align:right;">
-
 51
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Nitriliruptorales
-
 </td>
-
 <td style="text-align:right;">
-
 9.7
-
 </td>
-
 <td style="text-align:right;">
-
 58
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Nitrosomonadales
-
 </td>
-
 <td style="text-align:right;">
-
 11.5
-
 </td>
-
 <td style="text-align:right;">
-
 23
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Nitrospirales
-
 </td>
-
 <td style="text-align:right;">
-
 6.0
-
 </td>
-
 <td style="text-align:right;">
-
 12
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Oceanospirillales
-
 </td>
-
 <td style="text-align:right;">
-
 16.0
-
 </td>
-
 <td style="text-align:right;">
-
 16
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Orbales
-
 </td>
-
 <td style="text-align:right;">
-
 7.0
-
 </td>
-
 <td style="text-align:right;">
-
 7
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Order\_II
-
 </td>
-
 <td style="text-align:right;">
-
 4.8
-
 </td>
-
 <td style="text-align:right;">
-
 24
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Order\_III
-
 </td>
-
 <td style="text-align:right;">
-
 8.7
-
 </td>
-
 <td style="text-align:right;">
-
 26
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 PAUC43f\_marine\_benthic\_group
-
 </td>
-
 <td style="text-align:right;">
-
 2.0
-
 </td>
-
 <td style="text-align:right;">
-
 2
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Planctomycetales
-
 </td>
-
 <td style="text-align:right;">
-
 9.2
-
 </td>
-
 <td style="text-align:right;">
-
 74
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Propionibacteriales
-
 </td>
-
 <td style="text-align:right;">
-
 14.5
-
 </td>
-
 <td style="text-align:right;">
-
 318
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Pseudomonadales
-
 </td>
-
 <td style="text-align:right;">
-
 14.7
-
 </td>
-
 <td style="text-align:right;">
-
 103
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Pseudonocardiales
-
 </td>
-
 <td style="text-align:right;">
-
 18.0
-
 </td>
-
 <td style="text-align:right;">
-
 306
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Rhizobiales
-
 </td>
-
 <td style="text-align:right;">
-
 16.1
-
 </td>
-
 <td style="text-align:right;">
-
 386
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Rhodobacterales
-
 </td>
-
 <td style="text-align:right;">
-
 14.8
-
 </td>
-
 <td style="text-align:right;">
-
 163
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Rhodospirillales
-
 </td>
-
 <td style="text-align:right;">
-
 11.8
-
 </td>
-
 <td style="text-align:right;">
-
 271
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Rickettsiales
-
 </td>
-
 <td style="text-align:right;">
-
 11.2
-
 </td>
-
 <td style="text-align:right;">
-
 146
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Rubrobacterales
-
 </td>
-
 <td style="text-align:right;">
-
 22.3
-
 </td>
-
 <td style="text-align:right;">
-
 491
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 S0134\_terrestrial\_group
-
 </td>
-
 <td style="text-align:right;">
-
 18.0
-
 </td>
-
 <td style="text-align:right;">
-
 18
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SBYG-4553
-
 </td>
-
 <td style="text-align:right;">
-
 10.0
-
 </td>
-
 <td style="text-align:right;">
-
 10
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Solirubrobacterales
-
 </td>
-
 <td style="text-align:right;">
-
 17.2
-
 </td>
-
 <td style="text-align:right;">
-
 638
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Sphaerobacterales
-
 </td>
-
 <td style="text-align:right;">
-
 3.3
-
 </td>
-
 <td style="text-align:right;">
-
 10
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Sphingobacteriales
-
 </td>
-
 <td style="text-align:right;">
-
 14.2
-
 </td>
-
 <td style="text-align:right;">
-
 227
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Sphingomonadales
-
 </td>
-
 <td style="text-align:right;">
-
 19.6
-
 </td>
-
 <td style="text-align:right;">
-
 196
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Streptomycetales
-
 </td>
-
 <td style="text-align:right;">
-
 24.5
-
 </td>
-
 <td style="text-align:right;">
-
 49
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Streptosporangiales
-
 </td>
-
 <td style="text-align:right;">
-
 3.0
-
 </td>
-
 <td style="text-align:right;">
-
 3
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Subgroup\_3
-
 </td>
-
 <td style="text-align:right;">
-
 15.0
-
 </td>
-
 <td style="text-align:right;">
-
 15
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Subgroup\_4
-
 </td>
-
 <td style="text-align:right;">
-
 10.6
-
 </td>
-
 <td style="text-align:right;">
-
 85
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Subgroup\_6
-
 </td>
-
 <td style="text-align:right;">
-
 13.0
-
 </td>
-
 <td style="text-align:right;">
-
 52
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SubsectionI
-
 </td>
-
 <td style="text-align:right;">
-
 13.0
-
 </td>
-
 <td style="text-align:right;">
-
 13
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SubsectionII
-
 </td>
-
 <td style="text-align:right;">
-
 15.8
-
 </td>
-
 <td style="text-align:right;">
-
 315
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SubsectionIII
-
 </td>
-
 <td style="text-align:right;">
-
 14.8
-
 </td>
-
 <td style="text-align:right;">
-
 118
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SubsectionIV
-
 </td>
-
 <td style="text-align:right;">
-
 13.5
-
 </td>
-
 <td style="text-align:right;">
-
 54
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 TRA3-20
-
 </td>
-
 <td style="text-align:right;">
-
 14.0
-
 </td>
-
 <td style="text-align:right;">
-
 14
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Thermales
-
 </td>
-
 <td style="text-align:right;">
-
 23.0
-
 </td>
-
 <td style="text-align:right;">
-
 23
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Thermophilales
-
 </td>
-
 <td style="text-align:right;">
-
 15.0
-
 </td>
-
 <td style="text-align:right;">
-
 30
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Unclassified
-
 </td>
-
 <td style="text-align:right;">
-
 9.2
-
 </td>
-
 <td style="text-align:right;">
-
 642
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Unknown\_Order
-
 </td>
-
 <td style="text-align:right;">
-
 9.8
-
 </td>
-
 <td style="text-align:right;">
-
 98
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Vampirovibrionales
-
 </td>
-
 <td style="text-align:right;">
-
 6.0
-
 </td>
-
 <td style="text-align:right;">
-
 6
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 WD2101\_soil\_group
-
 </td>
-
 <td style="text-align:right;">
-
 13.0
-
 </td>
-
 <td style="text-align:right;">
-
 39
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Xanthomonadales
-
 </td>
-
 <td style="text-align:right;">
-
 18.0
-
 </td>
-
 <td style="text-align:right;">
-
 18
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 Based on that we will remove all phyla with a prevalence of under 8
@@ -2550,431 +1440,218 @@ sample_data(Ps_obj_filt) %>%
 ```
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Sample.name
-
 </th>
-
 <th style="text-align:right;">
-
 Library.size
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Chalk 2
-
 </td>
-
 <td style="text-align:right;">
-
 49453
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Chalk 3
-
 </td>
-
 <td style="text-align:right;">
-
 54155
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Chalk 4
-
 </td>
-
 <td style="text-align:right;">
-
 44943
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Chalk 5
-
 </td>
-
 <td style="text-align:right;">
-
 58835
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Chalk 6
-
 </td>
-
 <td style="text-align:right;">
-
 77459
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Limestone 1
-
 </td>
-
 <td style="text-align:right;">
-
 36122
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Limestone 2
-
 </td>
-
 <td style="text-align:right;">
-
 52816
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Limestone 3
-
 </td>
-
 <td style="text-align:right;">
-
 48378
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Limestone 4
-
 </td>
-
 <td style="text-align:right;">
-
 47108
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Limestone 5
-
 </td>
-
 <td style="text-align:right;">
-
 61346
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Limestone 6
-
 </td>
-
 <td style="text-align:right;">
-
 54505
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Limestone 1
-
 </td>
-
 <td style="text-align:right;">
-
 75578
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Chalk 1
-
 </td>
-
 <td style="text-align:right;">
-
 51651
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Chalk 2
-
 </td>
-
 <td style="text-align:right;">
-
 45197
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Chalk 3
-
 </td>
-
 <td style="text-align:right;">
-
 33625
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Chalk 4
-
 </td>
-
 <td style="text-align:right;">
-
 70886
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Chalk 5
-
 </td>
-
 <td style="text-align:right;">
-
 71458
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Chalk 6
-
 </td>
-
 <td style="text-align:right;">
-
 58959
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Chalk 7
-
 </td>
-
 <td style="text-align:right;">
-
 36756
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City Chalk 1
-
 </td>
-
 <td style="text-align:right;">
-
 23962
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Limestone 2
-
 </td>
-
 <td style="text-align:right;">
-
 62456
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Limestone 3
-
 </td>
-
 <td style="text-align:right;">
-
 36628
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Limestone 4
-
 </td>
-
 <td style="text-align:right;">
-
 57283
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Limestone 5
-
 </td>
-
 <td style="text-align:right;">
-
 64509
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope Limestone 6
-
 </td>
-
 <td style="text-align:right;">
-
 41564
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 The figure and table indicate only a small deviation in the number of
@@ -3018,7 +1695,7 @@ vsn::meanSdPlot(as.matrix(log2(t(otu_table(Ps_obj_filt))[notAllZero, ] + 1)))
 
 The difference in library sizes is low and its effect on the community
 composition is minimal. We’ll use the GMPR method for library size
-normalisation (Chen and Chen [2017](#ref-chen_gmpr:_2017))
+normalisation ([Chen and Chen 2017](#ref-chen_gmpr:_2017))
 
 ``` r
 Ps_obj_filt_GMPR <- Ps_obj_filt
@@ -3174,8 +1851,6 @@ Richness_Diversity_long %<>%
         sample_data(Ps_obj_filt))
 
 # S Obs
-data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.", ] 
-
 (mod_obsS <- TestAlphaV3(filter(Richness_Diversity_long, Metric == "S obs.")))
 ```
 
@@ -3185,10 +1860,10 @@ data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.",
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares        68       647              10123     62200
+    ## Sum of Squares     67.75    647.17           10123.07  62200.46
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 54.4
+    ## Residual standard error: 54.42358
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-1.svg)<!-- -->
@@ -3197,18 +1872,18 @@ data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.",
     ## Anova Table (Type III tests)
     ## 
     ## Response: Estimate
-    ##                    Sum Sq Df F value  Pr(>F)    
-    ## (Intercept)        588166  1  198.58 3.6e-12 ***
-    ## Location             3993  1    1.35   0.259    
-    ## Rock.type            7767  1    2.62   0.120    
-    ## Location:Rock.type  10123  1    3.42   0.079 .  
-    ## Residuals           62200 21                    
+    ##                    Sum Sq Df  F value    Pr(>F)    
+    ## (Intercept)        588166  1 198.5755 3.566e-12 ***
+    ## Location             3993  1   1.3480   0.25866    
+    ## Rock.type            7767  1   2.6224   0.12028    
+    ## Location:Rock.type  10123  1   3.4177   0.07863 .  
+    ## Residuals           62200 21                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
-    ##     
-    ## 311 
+    ##          
+    ## 310.9173 
     ## 
     ##  Location 
     ##     Slope City
@@ -3234,10 +1909,10 @@ data2test <- Richness_Diversity_long[Richness_Diversity_long$Metric == "S obs.",
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares        68       647              10123     62200
+    ## Sum of Squares     67.75    647.17           10123.07  62200.46
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 54.4
+    ## Residual standard error: 54.42358
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -3250,245 +1925,125 @@ summary(marginal)
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-290
-
+289.8684
 </td>
-
 <td style="text-align:right;">
-
-20.6
-
+20.57018
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-247
-
+247.0904
 </td>
-
 <td style="text-align:right;">
-
-333
-
+332.6465
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-325
-
+325.0227
 </td>
-
 <td style="text-align:right;">
-
-22.2
-
+22.21834
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-279
-
+278.8171
 </td>
-
 <td style="text-align:right;">
-
-371
-
+371.2282
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-339
-
+338.9012
 </td>
-
 <td style="text-align:right;">
-
-22.2
-
+22.21834
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-293
-
+292.6956
 </td>
-
 <td style="text-align:right;">
-
-385
-
+385.1067
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-293
-
+293.3852
 </td>
-
 <td style="text-align:right;">
-
-22.2
-
+22.21834
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-247
-
+247.1796
 </td>
-
 <td style="text-align:right;">
-
-340
-
+339.5907
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -3500,12 +2055,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate   SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk            -35.2 30.3 21 -1.161  0.6570 
-    ##  Slope Chalk - Slope Limestone       -49.0 30.3 21 -1.619  0.3900 
-    ##  Slope Chalk - City Limestone         -3.5 30.3 21 -0.116  0.9990 
-    ##  City Chalk - Slope Limestone        -13.9 31.4 21 -0.442  0.9700 
-    ##  City Chalk - City Limestone          31.6 31.4 21  1.007  0.7470 
-    ##  Slope Limestone - City Limestone     45.5 31.4 21  1.449  0.4850 
+    ##  Slope Chalk - City Chalk           -35.15 30.3 21 -1.161  0.6571 
+    ##  Slope Chalk - Slope Limestone      -49.03 30.3 21 -1.619  0.3897 
+    ##  Slope Chalk - City Limestone        -3.52 30.3 21 -0.116  0.9994 
+    ##  City Chalk - Slope Limestone       -13.88 31.4 21 -0.442  0.9705 
+    ##  City Chalk - City Limestone         31.64 31.4 21  1.007  0.7472 
+    ##  Slope Limestone - City Limestone    45.52 31.4 21  1.449  0.4847 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -3519,303 +2074,154 @@ contrast(marginal,
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 </th>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 <th style="text-align:left;">
-
 .group
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 1
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-290
-
+289.8684
 </td>
-
 <td style="text-align:right;">
-
-20.6
-
+20.57018
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-234
-
+233.8552
 </td>
-
 <td style="text-align:right;">
-
-346
-
+345.8817
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 4
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-293
-
+293.3852
 </td>
-
 <td style="text-align:right;">
-
-22.2
-
+22.21834
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-233
-
+232.8840
 </td>
-
 <td style="text-align:right;">
-
-354
-
+353.8864
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 2
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-325
-
+325.0227
 </td>
-
 <td style="text-align:right;">
-
-22.2
-
+22.21834
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-265
-
+264.5215
 </td>
-
 <td style="text-align:right;">
-
-386
-
+385.5239
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 3
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-339
-
+338.9012
 </td>
-
 <td style="text-align:right;">
-
-22.2
-
+22.21834
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-278
-
+278.4000
 </td>
-
 <td style="text-align:right;">
-
-399
-
+399.4024
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -3830,215 +2236,124 @@ a
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
+<th style="text-align:left;">
+</th>
 <th style="text-align:right;">
-
 Df
-
 </th>
-
 <th style="text-align:right;">
-
 Sum Sq
-
 </th>
-
 <th style="text-align:right;">
-
 Mean Sq
-
 </th>
-
 <th style="text-align:right;">
-
 F value
-
 </th>
-
 <th style="text-align:right;">
-
-Pr(\>F)
-
+Pr(&gt;F)
 </th>
-
 <th style="text-align:right;">
-
 Part Eta Sq
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
+<td style="text-align:left;">
+Location
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-67.7
-
+67.7481
 </td>
-
 <td style="text-align:right;">
-
-67.7
-
+67.7481
 </td>
-
 <td style="text-align:right;">
-
-0.023
-
+0.0228730
 </td>
-
 <td style="text-align:right;">
-
-0.881
-
+0.8812313
 </td>
-
 <td style="text-align:right;">
-
-0.001
-
+0.0009276
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-647.2
-
+647.1708
 </td>
-
 <td style="text-align:right;">
-
-647.2
-
+647.1708
 </td>
-
 <td style="text-align:right;">
-
-0.218
-
+0.2184966
 </td>
-
 <td style="text-align:right;">
-
-0.645
-
+0.6450019
 </td>
-
 <td style="text-align:right;">
-
-0.009
-
+0.0088607
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Location:Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-10123.1
-
+10123.0692
 </td>
-
 <td style="text-align:right;">
-
-10123.1
-
+10123.0692
 </td>
-
 <td style="text-align:right;">
-
-3.418
-
+3.4177313
 </td>
-
 <td style="text-align:right;">
-
-0.079
-
+0.0786297
 </td>
-
 <td style="text-align:right;">
-
-0.139
-
+0.1385992
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Residuals
+</td>
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-62200.5
-
+62200.4587
 </td>
-
 <td style="text-align:right;">
-
-2961.9
-
+2961.9266
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
-0.852
-
+0.8516126
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -4063,10 +2378,10 @@ emmip(mod_obsS, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares      1.33      0.09               0.26      4.79
+    ## Sum of Squares  1.325063  0.093952           0.262865  4.794581
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 0.478
+    ## Residual standard error: 0.4778215
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-3.svg)<!-- -->
@@ -4075,18 +2390,18 @@ emmip(mod_obsS, Location ~ Rock.type)
     ## Anova Table (Type III tests)
     ## 
     ## Response: Estimate
-    ##                    Sum Sq Df F value Pr(>F)    
-    ## (Intercept)         308.9  1 1353.08 <2e-16 ***
-    ## Location              1.4  1    6.10  0.022 *  
-    ## Rock.type             0.1  1    0.36  0.554    
-    ## Location:Rock.type    0.3  1    1.15  0.295    
-    ## Residuals             4.8 21                   
+    ##                     Sum Sq Df   F value  Pr(>F)    
+    ## (Intercept)        308.927  1 1353.0847 < 2e-16 ***
+    ## Location             1.393  1    6.1011 0.02216 *  
+    ## Rock.type            0.083  1    0.3616 0.55407    
+    ## Location:Rock.type   0.263  1    1.1513 0.29545    
+    ## Residuals            4.795 21                      
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
-    ##      
-    ## 3.53 
+    ##          
+    ## 3.526152 
     ## 
     ##  Location 
     ##     Slope  City
@@ -4112,10 +2427,10 @@ emmip(mod_obsS, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares      1.33      0.09               0.26      4.79
+    ## Sum of Squares  1.325063  0.093952           0.262865  4.794581
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 0.478
+    ## Residual standard error: 0.4778215
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -4128,245 +2443,125 @@ summary(marginal)
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-3.60
-
+3.599318
 </td>
-
 <td style="text-align:right;">
-
-0.181
-
+0.1805996
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-3.22
-
+3.223740
 </td>
-
 <td style="text-align:right;">
-
-3.98
-
+3.974895
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-3.33
-
+3.331707
 </td>
-
 <td style="text-align:right;">
-
-0.195
-
+0.1950698
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-2.93
-
+2.926037
 </td>
-
 <td style="text-align:right;">
-
-3.74
-
+3.737377
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-3.92
-
+3.920039
 </td>
-
 <td style="text-align:right;">
-
-0.195
-
+0.1950698
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-3.51
-
+3.514369
 </td>
-
 <td style="text-align:right;">
-
-4.33
-
+4.325709
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-3.24
-
+3.241351
 </td>
-
 <td style="text-align:right;">
-
-0.195
-
+0.1950698
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-2.84
-
+2.835681
 </td>
-
 <td style="text-align:right;">
-
-3.65
-
+3.647020
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -4378,12 +2573,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate    SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk            0.268 0.266 21  1.007  0.7470 
-    ##  Slope Chalk - Slope Limestone      -0.321 0.266 21 -1.206  0.6300 
-    ##  Slope Chalk - City Limestone        0.358 0.266 21  1.347  0.5450 
-    ##  City Chalk - Slope Limestone       -0.588 0.276 21 -2.133  0.1750 
-    ##  City Chalk - City Limestone         0.090 0.276 21  0.328  0.9880 
-    ##  Slope Limestone - City Limestone    0.679 0.276 21  2.460  0.0960 
+    ##  Slope Chalk - City Chalk           0.2676 0.266 21  1.007  0.7473 
+    ##  Slope Chalk - Slope Limestone     -0.3207 0.266 21 -1.206  0.6297 
+    ##  Slope Chalk - City Limestone       0.3580 0.266 21  1.347  0.5450 
+    ##  City Chalk - Slope Limestone      -0.5883 0.276 21 -2.133  0.1754 
+    ##  City Chalk - City Limestone        0.0904 0.276 21  0.328  0.9875 
+    ##  Slope Limestone - City Limestone   0.6787 0.276 21  2.460  0.0962 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -4397,303 +2592,154 @@ contrast(marginal,
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 </th>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 <th style="text-align:left;">
-
 .group
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 4
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-3.24
-
+3.241351
 </td>
-
 <td style="text-align:right;">
-
-0.195
-
+0.1950698
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-2.71
-
+2.710170
 </td>
-
 <td style="text-align:right;">
-
-3.77
-
+3.772532
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 2
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-3.33
-
+3.331707
 </td>
-
 <td style="text-align:right;">
-
-0.195
-
+0.1950698
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-2.80
-
+2.800526
 </td>
-
 <td style="text-align:right;">
-
-3.86
-
+3.862888
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 1
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-3.60
-
+3.599318
 </td>
-
 <td style="text-align:right;">
-
-0.181
-
+0.1805996
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-3.11
-
+3.107540
 </td>
-
 <td style="text-align:right;">
-
-4.09
-
+4.091096
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 3
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-3.92
-
+3.920039
 </td>
-
 <td style="text-align:right;">
-
-0.195
-
+0.1950698
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-3.39
-
+3.388858
 </td>
-
 <td style="text-align:right;">
-
-4.45
-
+4.451220
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -4708,215 +2754,124 @@ a
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
+<th style="text-align:left;">
+</th>
 <th style="text-align:right;">
-
 Df
-
 </th>
-
 <th style="text-align:right;">
-
 Sum Sq
-
 </th>
-
 <th style="text-align:right;">
-
 Mean Sq
-
 </th>
-
 <th style="text-align:right;">
-
 F value
-
 </th>
-
 <th style="text-align:right;">
-
-Pr(\>F)
-
+Pr(&gt;F)
 </th>
-
 <th style="text-align:right;">
-
 Part Eta Sq
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
+<td style="text-align:left;">
+Location
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-1.325
-
+1.3250630
 </td>
-
 <td style="text-align:right;">
-
-1.325
-
+1.3250630
 </td>
-
 <td style="text-align:right;">
-
-5.804
-
+5.8037028
 </td>
-
 <td style="text-align:right;">
-
-0.025
-
+0.0252549
 </td>
-
 <td style="text-align:right;">
-
-0.205
-
+0.2045968
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-0.094
-
+0.0939515
 </td>
-
 <td style="text-align:right;">
-
-0.094
-
+0.0939515
 </td>
-
 <td style="text-align:right;">
-
-0.412
-
+0.4115025
 </td>
-
 <td style="text-align:right;">
-
-0.528
-
+0.5281480
 </td>
-
 <td style="text-align:right;">
-
-0.015
-
+0.0145066
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Location:Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-0.263
-
+0.2628651
 </td>
-
 <td style="text-align:right;">
-
-0.263
-
+0.2628651
 </td>
-
 <td style="text-align:right;">
-
-1.151
-
+1.1513345
 </td>
-
 <td style="text-align:right;">
-
-0.295
-
+0.2954460
 </td>
-
 <td style="text-align:right;">
-
-0.041
-
+0.0405878
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Residuals
+</td>
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-4.795
-
+4.7945811
 </td>
-
 <td style="text-align:right;">
-
-0.228
-
+0.2283134
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
-0.740
-
+0.7403088
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -4939,10 +2894,10 @@ emmip(mod_Shannon, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares        10      1969               8756     68810
+    ## Sum of Squares     10.12   1969.32            8755.53  68809.75
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 57.2
+    ## Residual standard error: 57.24207
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-5.svg)<!-- -->
@@ -4951,18 +2906,18 @@ emmip(mod_Shannon, Location ~ Rock.type)
     ## Anova Table (Type III tests)
     ## 
     ## Response: Estimate
-    ##                     Sum Sq Df F value Pr(>F)    
-    ## (Intercept)        4281315  1 1306.61 <2e-16 ***
-    ## Location                 4  1    0.00   0.97    
-    ## Rock.type             1671  1    0.51   0.48    
-    ## Location:Rock.type    8756  1    2.67   0.12    
-    ## Residuals            68810 21                   
+    ##                     Sum Sq Df   F value Pr(>F)    
+    ## (Intercept)        4281315  1 1306.6116 <2e-16 ***
+    ## Location                 4  1    0.0012 0.9725    
+    ## Rock.type             1671  1    0.5100 0.4830    
+    ## Location:Rock.type    8756  1    2.6721 0.1170    
+    ## Residuals            68810 21                     
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
-    ##     
-    ## 414 
+    ##          
+    ## 413.6874 
     ## 
     ##  Location 
     ##     Slope City
@@ -4988,10 +2943,10 @@ emmip(mod_Shannon, Location ~ Rock.type)
     ## 
     ## Terms:
     ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares        10      1969               8756     68810
+    ## Sum of Squares     10.12   1969.32            8755.53  68809.75
     ## Deg. of Freedom        1         1                  1        21
     ## 
-    ## Residual standard error: 57.2
+    ## Residual standard error: 57.24207
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -5004,245 +2959,125 @@ summary(marginal)
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-388
-
+388.1990
 </td>
-
 <td style="text-align:right;">
-
-21.6
-
+21.63547
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-343
-
+343.2056
 </td>
-
 <td style="text-align:right;">
-
-433
-
+433.1924
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-425
-
+424.9111
 </td>
-
 <td style="text-align:right;">
-
-23.4
-
+23.36898
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-376
-
+376.3126
 </td>
-
 <td style="text-align:right;">
-
-474
-
+473.5095
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-442
-
+442.0997
 </td>
-
 <td style="text-align:right;">
-
-23.4
-
+23.36898
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-394
-
+393.5012
 </td>
-
 <td style="text-align:right;">
-
-491
-
+490.6981
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-404
-
+403.7881
 </td>
-
 <td style="text-align:right;">
-
-23.4
-
+23.36898
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-355
-
+355.1896
 </td>
-
 <td style="text-align:right;">
-
-452
-
+452.3865
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -5255,11 +3090,11 @@ contrast(marginal,
 
     ##  contrast                         estimate   SE df t.ratio p.value
     ##  Slope Chalk - City Chalk            -36.7 31.8 21 -1.153  0.6620 
-    ##  Slope Chalk - Slope Limestone       -53.9 31.8 21 -1.693  0.3520 
-    ##  Slope Chalk - City Limestone        -15.6 31.8 21 -0.490  0.9610 
-    ##  City Chalk - Slope Limestone        -17.2 33.0 21 -0.520  0.9530 
-    ##  City Chalk - City Limestone          21.1 33.0 21  0.639  0.9180 
-    ##  Slope Limestone - City Limestone     38.3 33.0 21  1.159  0.6580 
+    ##  Slope Chalk - Slope Limestone       -53.9 31.8 21 -1.693  0.3522 
+    ##  Slope Chalk - City Limestone        -15.6 31.8 21 -0.490  0.9606 
+    ##  City Chalk - Slope Limestone        -17.2 33.0 21 -0.520  0.9533 
+    ##  City Chalk - City Limestone          21.1 33.0 21  0.639  0.9181 
+    ##  Slope Limestone - City Limestone     38.3 33.0 21  1.159  0.6581 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -5273,303 +3108,154 @@ contrast(marginal,
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 </th>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 <th style="text-align:left;">
-
 .group
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 1
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-388
-
+388.1990
 </td>
-
 <td style="text-align:right;">
-
-21.6
-
+21.63547
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-329
-
+329.2849
 </td>
-
 <td style="text-align:right;">
-
-447
-
+447.1130
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 4
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-404
-
+403.7881
 </td>
-
 <td style="text-align:right;">
-
-23.4
-
+23.36898
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-340
-
+340.1536
 </td>
-
 <td style="text-align:right;">
-
-467
-
+467.4225
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 2
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-425
-
+424.9111
 </td>
-
 <td style="text-align:right;">
-
-23.4
-
+23.36898
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-361
-
+361.2766
 </td>
-
 <td style="text-align:right;">
-
-489
-
+488.5455
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 3
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-442
-
+442.0997
 </td>
-
 <td style="text-align:right;">
-
-23.4
-
+23.36898
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-378
-
+378.4653
 </td>
-
 <td style="text-align:right;">
-
-506
-
+505.7341
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -5584,215 +3270,124 @@ a
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
+<th style="text-align:left;">
+</th>
 <th style="text-align:right;">
-
 Df
-
 </th>
-
 <th style="text-align:right;">
-
 Sum Sq
-
 </th>
-
 <th style="text-align:right;">
-
 Mean Sq
-
 </th>
-
 <th style="text-align:right;">
-
 F value
-
 </th>
-
 <th style="text-align:right;">
-
-Pr(\>F)
-
+Pr(&gt;F)
 </th>
-
 <th style="text-align:right;">
-
 Part Eta Sq
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
+<td style="text-align:left;">
+Location
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-10.1
-
+10.11758
 </td>
-
 <td style="text-align:right;">
-
-10.1
-
+10.11758
 </td>
-
 <td style="text-align:right;">
-
-0.003
-
+0.0030878
 </td>
-
 <td style="text-align:right;">
-
-0.956
-
+0.9562114
 </td>
-
 <td style="text-align:right;">
-
-0.000
-
+0.0001272
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-1969.3
-
+1969.32310
 </td>
-
 <td style="text-align:right;">
-
-1969.3
-
+1969.32310
 </td>
-
 <td style="text-align:right;">
-
-0.601
-
+0.6010164
 </td>
-
 <td style="text-align:right;">
-
-0.447
-
+0.4468331
 </td>
-
 <td style="text-align:right;">
-
-0.025
-
+0.0247574
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Location:Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-8755.5
-
+8755.52902
 </td>
-
 <td style="text-align:right;">
-
-8755.5
-
+8755.52902
 </td>
-
 <td style="text-align:right;">
-
-2.672
-
+2.6720940
 </td>
-
 <td style="text-align:right;">
-
-0.117
-
+0.1170242
 </td>
-
 <td style="text-align:right;">
-
-0.110
-
+0.1100705
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Residuals
+</td>
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-68809.7
-
+68809.74549
 </td>
-
 <td style="text-align:right;">
-
-3276.7
-
+3276.65455
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
-0.865
-
+0.8650448
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -5816,11 +3411,11 @@ emmip(mod_ACE, Location ~ Rock.type)
     ##     factor_names[2], sep = " * "), sep = " ~ ")), data = data2test)
     ## 
     ## Terms:
-    ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares       508       107                117      1060
-    ## Deg. of Freedom        1         1                  1        21
+    ##                  Location Rock.type Location:Rock.type Residuals
+    ## Sum of Squares   507.6609  107.4251           117.0279 1059.8590
+    ## Deg. of Freedom         1         1                  1        21
     ## 
-    ## Residual standard error: 7.1
+    ## Residual standard error: 7.104187
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-7.svg)<!-- -->
@@ -5829,18 +3424,18 @@ emmip(mod_ACE, Location ~ Rock.type)
     ## Anova Table (Type III tests)
     ## 
     ## Response: Estimate
-    ##                    Sum Sq Df F value  Pr(>F)    
-    ## (Intercept)          7346  1  145.56 6.6e-11 ***
-    ## Location              543  1   10.76  0.0036 ** 
-    ## Rock.type              99  1    1.96  0.1757    
-    ## Location:Rock.type    117  1    2.32  0.1427    
-    ## Residuals            1060 21                    
+    ##                    Sum Sq Df  F value    Pr(>F)    
+    ## (Intercept)        7346.2  1 145.5569 6.594e-11 ***
+    ## Location            542.8  1  10.7552  0.003577 ** 
+    ## Rock.type            99.1  1   1.9643  0.175658    
+    ## Location:Rock.type  117.0  1   2.3188  0.142737    
+    ## Residuals          1059.9 21                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
-    ##      
-    ## 17.2 
+    ##          
+    ## 17.20043 
     ## 
     ##  Location 
     ##     Slope City
@@ -5855,21 +3450,21 @@ emmip(mod_ACE, Location ~ Rock.type)
     ##  Location:Rock.type 
     ##         Rock.type
     ## Location Chalk Limestone
-    ##    Slope 17.7  26.0     
-    ##    rep    7.0   6.0     
-    ##    City  12.7  12.3     
-    ##    rep    6.0   6.0
+    ##    Slope 17.69 26.01    
+    ##    rep    7.00  6.00    
+    ##    City  12.68 12.34    
+    ##    rep    6.00  6.00
 
     ## Call:
     ##    aov(formula = as.formula(paste(response_name, paste(factor_names[1], 
     ##     factor_names[2], sep = " * "), sep = " ~ ")), data = data2test)
     ## 
     ## Terms:
-    ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares       508       107                117      1060
-    ## Deg. of Freedom        1         1                  1        21
+    ##                  Location Rock.type Location:Rock.type Residuals
+    ## Sum of Squares   507.6609  107.4251           117.0279 1059.8590
+    ## Deg. of Freedom         1         1                  1        21
     ## 
-    ## Residual standard error: 7.1
+    ## Residual standard error: 7.104187
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -5882,245 +3477,125 @@ summary(marginal)
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-17.7
-
+17.68601
 </td>
-
 <td style="text-align:right;">
-
-2.69
-
+2.685130
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-12.10
-
+12.101979
 </td>
-
 <td style="text-align:right;">
-
-23.3
-
+23.27005
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-12.7
-
+12.68276
 </td>
-
 <td style="text-align:right;">
-
-2.90
-
+2.900272
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-6.65
-
+6.651317
 </td>
-
 <td style="text-align:right;">
-
-18.7
-
+18.71421
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-26.0
-
+26.01445
 </td>
-
 <td style="text-align:right;">
-
-2.90
-
+2.900272
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-19.98
-
+19.983005
 </td>
-
 <td style="text-align:right;">
-
-32.0
-
+32.04590
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-12.3
-
+12.33755
 </td>
-
 <td style="text-align:right;">
-
-2.90
-
+2.900272
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-6.31
-
+6.306105
 </td>
-
 <td style="text-align:right;">
-
-18.4
-
+18.36900
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -6132,12 +3607,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate   SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk             5.00 3.95 21  1.270  0.5940 
-    ##  Slope Chalk - Slope Limestone       -8.33 3.95 21 -2.110  0.1830 
-    ##  Slope Chalk - City Limestone         5.35 3.95 21  1.350  0.5410 
-    ##  City Chalk - Slope Limestone       -13.33 4.10 21 -3.250  0.0190 
-    ##  City Chalk - City Limestone          0.35 4.10 21  0.080  1.0000 
-    ##  Slope Limestone - City Limestone    13.68 4.10 21  3.330  0.0150 
+    ##  Slope Chalk - City Chalk            5.003 3.95 21  1.266  0.5937 
+    ##  Slope Chalk - Slope Limestone      -8.328 3.95 21 -2.107  0.1834 
+    ##  Slope Chalk - City Limestone        5.348 3.95 21  1.353  0.5410 
+    ##  City Chalk - Slope Limestone      -13.332 4.10 21 -3.250  0.0185 
+    ##  City Chalk - City Limestone         0.345 4.10 21  0.084  0.9998 
+    ##  Slope Limestone - City Limestone   13.677 4.10 21  3.335  0.0154 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -6151,303 +3626,154 @@ contrast(marginal,
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 </th>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 <th style="text-align:left;">
-
 .group
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 4
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-12.3
-
+12.33755
 </td>
-
 <td style="text-align:right;">
-
-2.90
-
+2.900272
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-4.44
-
+4.440021
 </td>
-
 <td style="text-align:right;">
-
-20.2
-
+20.23508
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 2
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-12.7
-
+12.68276
 </td>
-
 <td style="text-align:right;">
-
-2.90
-
+2.900272
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-4.79
-
+4.785233
 </td>
-
 <td style="text-align:right;">
-
-20.6
-
+20.58029
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 1
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-17.7
-
+17.68601
 </td>
-
 <td style="text-align:right;">
-
-2.69
-
+2.685130
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-10.37
-
+10.374321
 </td>
-
 <td style="text-align:right;">
-
-25.0
-
+24.99771
 </td>
-
 <td style="text-align:left;">
-
 ab
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 3
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-26.0
-
+26.01445
 </td>
-
 <td style="text-align:right;">
-
-2.90
-
+2.900272
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-18.12
-
+18.116921
 </td>
-
 <td style="text-align:right;">
-
-33.9
-
+33.91198
 </td>
-
 <td style="text-align:left;">
-
 b
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -6462,215 +3788,124 @@ b
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
+<th style="text-align:left;">
+</th>
 <th style="text-align:right;">
-
 Df
-
 </th>
-
 <th style="text-align:right;">
-
 Sum Sq
-
 </th>
-
 <th style="text-align:right;">
-
 Mean Sq
-
 </th>
-
 <th style="text-align:right;">
-
 F value
-
 </th>
-
 <th style="text-align:right;">
-
-Pr(\>F)
-
+Pr(&gt;F)
 </th>
-
 <th style="text-align:right;">
-
 Part Eta Sq
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
+<td style="text-align:left;">
+Location
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-508
-
+507.6609
 </td>
-
 <td style="text-align:right;">
-
-507.7
-
+507.66088
 </td>
-
 <td style="text-align:right;">
-
-10.06
-
+10.058770
 </td>
-
 <td style="text-align:right;">
-
-0.005
-
+0.0045968
 </td>
-
 <td style="text-align:right;">
-
-0.283
-
+0.2832972
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-107
-
+107.4251
 </td>
-
 <td style="text-align:right;">
-
-107.4
-
+107.42510
 </td>
-
 <td style="text-align:right;">
-
-2.13
-
+2.128516
 </td>
-
 <td style="text-align:right;">
-
-0.159
-
+0.1593772
 </td>
-
 <td style="text-align:right;">
-
-0.060
-
+0.0599479
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Location:Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-117
-
+117.0279
 </td>
-
 <td style="text-align:right;">
-
-117.0
-
+117.02787
 </td>
-
 <td style="text-align:right;">
-
-2.32
-
+2.318785
 </td>
-
 <td style="text-align:right;">
-
-0.143
-
+0.1427372
 </td>
-
 <td style="text-align:right;">
-
-0.065
-
+0.0653067
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Residuals
+</td>
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-1060
-
+1059.8590
 </td>
-
 <td style="text-align:right;">
-
-50.5
-
+50.46948
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
-0.591
-
+0.5914481
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -6695,11 +3930,11 @@ emmip(mod_InvSim, Location ~ Rock.type)
     ##     factor_names[2], sep = " * "), sep = " ~ ")), data = data2test)
     ## 
     ## Terms:
-    ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares    0.0718    0.0103             0.0002    0.1120
-    ## Deg. of Freedom        1         1                  1        21
+    ##                   Location  Rock.type Location:Rock.type  Residuals
+    ## Sum of Squares  0.07180240 0.01029748         0.00019359 0.11203611
+    ## Deg. of Freedom          1          1                  1         21
     ## 
-    ## Residual standard error: 0.073
+    ## Residual standard error: 0.07304145
     ## Estimated effects may be unbalanced
 
 ![](BRC_growth_rate_figures/test%20alpha-9.svg)<!-- -->
@@ -6708,18 +3943,18 @@ emmip(mod_InvSim, Location ~ Rock.type)
     ## Anova Table (Type III tests)
     ## 
     ## Response: Estimate
-    ##                    Sum Sq Df F value  Pr(>F)    
-    ## (Intercept)         0.952  1  178.41 9.9e-12 ***
-    ## Location            0.074  1   13.87  0.0013 ** 
-    ## Rock.type           0.010  1    1.91  0.1817    
-    ## Location:Rock.type  0.000  1    0.04  0.8508    
-    ## Residuals           0.112 21                    
+    ##                     Sum Sq Df  F value    Pr(>F)    
+    ## (Intercept)        0.95185  1 178.4141 9.851e-12 ***
+    ## Location           0.07398  1  13.8668  0.001255 ** 
+    ## Rock.type          0.01018  1   1.9080  0.181711    
+    ## Location:Rock.type 0.00019  1   0.0363  0.850753    
+    ## Residuals          0.11204 21                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## Tables of means
     ## Grand mean
-    ##       
-    ## 0.194 
+    ##           
+    ## 0.1943002 
     ## 
     ##  Location 
     ##      Slope  City
@@ -6744,11 +3979,11 @@ emmip(mod_InvSim, Location ~ Rock.type)
     ##     factor_names[2], sep = " * "), sep = " ~ ")), data = data2test)
     ## 
     ## Terms:
-    ##                 Location Rock.type Location:Rock.type Residuals
-    ## Sum of Squares    0.0718    0.0103             0.0002    0.1120
-    ## Deg. of Freedom        1         1                  1        21
+    ##                   Location  Rock.type Location:Rock.type  Residuals
+    ## Sum of Squares  0.07180240 0.01029748         0.00019359 0.11203611
+    ## Deg. of Freedom          1          1                  1         21
     ## 
-    ## Residual standard error: 0.073
+    ## Residual standard error: 0.07304145
     ## Estimated effects may be unbalanced
 
 ``` r
@@ -6761,245 +3996,125 @@ summary(marginal)
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-0.164
-
+0.1640529
 </td>
-
 <td style="text-align:right;">
-
-0.028
-
+0.0276071
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.107
-
+0.1066408
 </td>
-
 <td style="text-align:right;">
-
-0.221
-
+0.2214649
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-0.268
-
+0.2675148
 </td>
-
 <td style="text-align:right;">
-
-0.030
-
+0.0298190
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.206
-
+0.2055027
 </td>
-
 <td style="text-align:right;">
-
-0.330
-
+0.3295269
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-0.118
-
+0.1180283
 </td>
-
 <td style="text-align:right;">
-
-0.030
-
+0.0298190
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.056
-
+0.0560162
 </td>
-
 <td style="text-align:right;">
-
-0.180
-
+0.1800404
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-0.233
-
+0.2326462
 </td>
-
 <td style="text-align:right;">
-
-0.030
-
+0.0298190
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.171
-
+0.1706341
 </td>
-
 <td style="text-align:right;">
-
-0.295
-
+0.2946583
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -7011,12 +4126,12 @@ contrast(marginal,
 ```
 
     ##  contrast                         estimate     SE df t.ratio p.value
-    ##  Slope Chalk - City Chalk          -0.1035 0.0406 21 -2.550  0.0810 
-    ##  Slope Chalk - Slope Limestone      0.0460 0.0406 21  1.130  0.6740 
-    ##  Slope Chalk - City Limestone      -0.0686 0.0406 21 -1.690  0.3550 
-    ##  City Chalk - Slope Limestone       0.1495 0.0422 21  3.540  0.0100 
-    ##  City Chalk - City Limestone        0.0349 0.0422 21  0.830  0.8410 
-    ##  Slope Limestone - City Limestone  -0.1146 0.0422 21 -2.720  0.0580 
+    ##  Slope Chalk - City Chalk          -0.1035 0.0406 21 -2.546  0.0814 
+    ##  Slope Chalk - Slope Limestone      0.0460 0.0406 21  1.133  0.6741 
+    ##  Slope Chalk - City Limestone      -0.0686 0.0406 21 -1.688  0.3545 
+    ##  City Chalk - Slope Limestone       0.1495 0.0422 21  3.545  0.0096 
+    ##  City Chalk - City Limestone        0.0349 0.0422 21  0.827  0.8411 
+    ##  Slope Limestone - City Limestone  -0.1146 0.0422 21 -2.718  0.0577 
     ## 
     ## P value adjustment: tukey method for comparing a family of 4 estimates
 
@@ -7030,303 +4145,154 @@ contrast(marginal,
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 </th>
-
 <th style="text-align:left;">
-
 Location
-
 </th>
-
 <th style="text-align:left;">
-
 Rock.type
-
 </th>
-
 <th style="text-align:right;">
-
 emmean
-
 </th>
-
 <th style="text-align:right;">
-
 SE
-
 </th>
-
 <th style="text-align:right;">
-
 df
-
 </th>
-
 <th style="text-align:right;">
-
 lower.CL
-
 </th>
-
 <th style="text-align:right;">
-
 upper.CL
-
 </th>
-
 <th style="text-align:left;">
-
 .group
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 3
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-0.118
-
+0.1180283
 </td>
-
 <td style="text-align:right;">
-
-0.030
-
+0.0298190
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.037
-
+0.0368302
 </td>
-
 <td style="text-align:right;">
-
-0.199
-
+0.1992265
 </td>
-
 <td style="text-align:left;">
-
 a
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 1
-
 </td>
-
 <td style="text-align:left;">
-
 Slope
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-0.164
-
+0.1640529
 </td>
-
 <td style="text-align:right;">
-
-0.028
-
+0.0276071
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.089
-
+0.0888780
 </td>
-
 <td style="text-align:right;">
-
-0.239
-
+0.2392278
 </td>
-
 <td style="text-align:left;">
-
 ab
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 4
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Limestone
-
 </td>
-
 <td style="text-align:right;">
-
-0.233
-
+0.2326462
 </td>
-
 <td style="text-align:right;">
-
-0.030
-
+0.0298190
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.151
-
+0.1514480
 </td>
-
 <td style="text-align:right;">
-
-0.314
-
+0.3138443
 </td>
-
 <td style="text-align:left;">
-
 ab
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 2
-
 </td>
-
 <td style="text-align:left;">
-
 City
-
 </td>
-
 <td style="text-align:left;">
-
 Chalk
-
 </td>
-
 <td style="text-align:right;">
-
-0.268
-
+0.2675148
 </td>
-
 <td style="text-align:right;">
-
-0.030
-
+0.0298190
 </td>
-
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.186
-
+0.1863167
 </td>
-
 <td style="text-align:right;">
-
-0.349
-
+0.3487130
 </td>
-
 <td style="text-align:left;">
-
 b
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -7341,215 +4307,124 @@ b
 <div class="kable-table">
 
 <table>
-
 <thead>
-
 <tr>
-
+<th style="text-align:left;">
+</th>
 <th style="text-align:right;">
-
 Df
-
 </th>
-
 <th style="text-align:right;">
-
 Sum Sq
-
 </th>
-
 <th style="text-align:right;">
-
 Mean Sq
-
 </th>
-
 <th style="text-align:right;">
-
 F value
-
 </th>
-
 <th style="text-align:right;">
-
-Pr(\>F)
-
+Pr(&gt;F)
 </th>
-
 <th style="text-align:right;">
-
 Part Eta Sq
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
+<td style="text-align:left;">
+Location
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-0.072
-
+0.0718024
 </td>
-
 <td style="text-align:right;">
-
-0.072
-
+0.0718024
 </td>
-
 <td style="text-align:right;">
-
-13.459
-
+13.4586112
 </td>
-
 <td style="text-align:right;">
-
-0.001
-
+0.0014309
 </td>
-
 <td style="text-align:right;">
-
-0.369
-
+0.3694878
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-0.010
-
+0.0102975
 </td>
-
 <td style="text-align:right;">
-
-0.010
-
+0.0102975
 </td>
-
 <td style="text-align:right;">
-
-1.930
-
+1.9301546
 </td>
-
 <td style="text-align:right;">
-
-0.179
-
+0.1792983
 </td>
-
 <td style="text-align:right;">
-
-0.053
-
+0.0529898
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Location:Rock.type
+</td>
 <td style="text-align:right;">
-
 1
-
 </td>
-
 <td style="text-align:right;">
-
-0.000
-
+0.0001936
 </td>
-
 <td style="text-align:right;">
-
-0.000
-
+0.0001936
 </td>
-
 <td style="text-align:right;">
-
-0.036
-
+0.0362871
 </td>
-
 <td style="text-align:right;">
-
-0.851
-
+0.8507532
 </td>
-
 <td style="text-align:right;">
-
-0.001
-
+0.0009962
 </td>
-
 </tr>
-
 <tr>
-
+<td style="text-align:left;">
+Residuals
+</td>
 <td style="text-align:right;">
-
 21
-
 </td>
-
 <td style="text-align:right;">
-
-0.112
-
+0.1120361
 </td>
-
 <td style="text-align:right;">
-
-0.005
-
+0.0053351
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
 NA
-
 </td>
-
 <td style="text-align:right;">
-
-0.577
-
+0.5765263
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 </div>
@@ -7602,6 +4477,7 @@ p_alpha <- ggplot() +
   ),
   legend.position="none") +
   facet_grid(Metric ~ Rock.type, scale = "free") +
+  theme(strip.text = element_text(size = f_size - 4)) +
   background_grid(major = "y",
                   minor = "none",
                   size.major = 0.8) 
@@ -7896,7 +4772,7 @@ p_ord_phylo <- ggplot(ord_df,
     inherit.aes = FALSE
   ) +
   geom_point2(size = 4, alpha = 2 / 3) +
-  theme_bw(base_size = 14) +
+  # theme_bw(base_size = f_size) +
   guides(colour = guide_legend(title = "Location"), shape = guide_legend(title = "Rock.type")) +
   scale_colour_manual(values = Gradient.colours) +
   scale_fill_manual(values = Gradient.colours, guide = "none") +
@@ -7918,7 +4794,7 @@ marginal means.
 ``` r
 Taxa_tests_phylum1 <- STAMPR2(Ps_obj_filt, vars2test = "Location", threshold = 0.05, outputfile = paste0(Proj_name, "_Location"))
 
-pSTAMPR1 <- plotSTAMPR(Taxa_tests_phylum1, pair = "Slope - City")
+pSTAMPR1 <- plotSTAMPR(Taxa_tests_phylum1, pair = "Slope - City", f_size = f_size)
 print(pSTAMPR1)
 ```
 
@@ -7927,7 +4803,7 @@ print(pSTAMPR1)
 ``` r
 Taxa_tests_phylum2 <- STAMPR2(Ps_obj_filt, vars2test = c("Location", "Rock.type"), threshold = 0.05, outputfile = paste0(Proj_name, "_Location_Rock"))
 
-pSTAMPR2 <- plotSTAMPR(Taxa_tests_phylum2, pair = "Slope:Chalk - City:Chalk")
+pSTAMPR2 <- plotSTAMPR(Taxa_tests_phylum2, pair = "Slope:Chalk - City:Chalk", f_size = f_size)
 print(pSTAMPR2)
 ```
 
@@ -7987,437 +4863,221 @@ Rares %>%
 ```
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
-
 <caption>
-
 Percentage of reads per sample classified as rare:
-
 </caption>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Sample
-
 </th>
-
 <th style="text-align:right;">
-
 Rares (%)
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSClk1S12
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSClk2S15
-
 </td>
-
 <td style="text-align:right;">
-
 0.59
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSClk3S16
-
 </td>
-
 <td style="text-align:right;">
-
 0.02
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSClk4S17
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSClk5S18
-
 </td>
-
 <td style="text-align:right;">
-
 0.00
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSLimek1S13
-
 </td>
-
 <td style="text-align:right;">
-
 0.02
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSLimek2S14
-
 </td>
-
 <td style="text-align:right;">
-
 0.04
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSLimek3S19
-
 </td>
-
 <td style="text-align:right;">
-
 0.11
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSLimek4S20
-
 </td>
-
 <td style="text-align:right;">
-
 0.24
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSLimek5S21
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 ShivSLimek6S25
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk1S3
-
 </td>
-
 <td style="text-align:right;">
-
 0.24
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk2S4
-
 </td>
-
 <td style="text-align:right;">
-
 0.03
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk3S5
-
 </td>
-
 <td style="text-align:right;">
-
 0.03
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk4S6
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk5S7
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk6S8
-
 </td>
-
 <td style="text-align:right;">
-
 0.03
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk7S9
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk8S10
-
 </td>
-
 <td style="text-align:right;">
-
 0.02
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpClk9S11
-
 </td>
-
 <td style="text-align:right;">
-
 0.03
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpLime1S1
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpLime2S2
-
 </td>
-
 <td style="text-align:right;">
-
 0.02
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpLime3S22
-
 </td>
-
 <td style="text-align:right;">
-
 0.07
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpLime4S23
-
 </td>
-
 <td style="text-align:right;">
-
 0.01
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 SlpLime5S24
-
 </td>
-
 <td style="text-align:right;">
-
 0.02
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 ``` r
@@ -8438,101 +5098,53 @@ Rares_merged %>%
 ```
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
-
 <caption>
-
 Percentage of reads per sample classified as rare:
-
 </caption>
-
 <thead>
-
 <tr>
-
 <th style="text-align:left;">
-
 Location.rock
-
 </th>
-
 <th style="text-align:right;">
-
 Rares (%)
-
 </th>
-
 </tr>
-
 </thead>
-
 <tbody>
-
 <tr>
-
 <td style="text-align:left;">
-
 City:Chalk
-
 </td>
-
 <td style="text-align:right;">
-
 0.11
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 City:Limestone
-
 </td>
-
 <td style="text-align:right;">
-
 0.07
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope:Chalk
-
 </td>
-
 <td style="text-align:right;">
-
 0.02
-
 </td>
-
 </tr>
-
 <tr>
-
 <td style="text-align:left;">
-
 Slope:Limestone
-
 </td>
-
 <td style="text-align:right;">
-
 0.06
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
 Plot taxonomy box-plot
@@ -8557,8 +5169,7 @@ p_taxa_box <-
     size = 2
   ) +
   scale_colour_manual(values = Gradient.colours, name = "") +
-  theme_bw()+
-  # theme_cowplot(font_size = 11, font_family = f_name) +
+  # theme_bw()+
   labs(x = NULL, y = "Relative abundance (%)") +
   guides(colour = guide_legend(override.aes = list(size = 5))) +
   facet_grid(Location ~ .) +
@@ -8609,8 +5220,8 @@ Ps_obj_filt_GMPR_glom_rel_DF %>%
   arrange(desc(Abundance)) -> Taxa_rank
 ```
 
-Detect differentially abundant OTUs using corncob (Martin, Witten, and
-Willis [2020](#ref-martin_modeling_2020))
+Detect differentially abundant OTUs using corncob ([Martin, Witten, and
+Willis 2020](#ref-martin_modeling_2020))
 
 ``` r
 comparison_string <- c("City", "Slope")
@@ -8830,35 +5441,33 @@ plot(mod260_Loc, color = "Location", shape = "Rock.type") # add total = TRUE for
 ### Compose figures
 
 ``` r
-composite_plot <- ((p_alpha + p_taxa_box +  plot_layout(widths = c(1, 2))) /(p_ord + pSTAMPR1) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)))
+# composite_plot <- ((p_alpha + p_taxa_box +  plot_layout(widths = c(1, 2))) /(p_ord + pSTAMPR1) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)))
+
+composite_plot <- (p_alpha + p_ord) /(p_taxa_box) / (pSTAMPR1) + 
+  plot_layout(heights = c(1.5, 1, 1)) +
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)) 
 
 plot_file <- "./Results/Microbiome_1"
 svglite(paste0(plot_file, ".svg"), 
-        width = 14, 
-        height = 10.5)
+        width = 10, 
+        height = 11)
 print(composite_plot)
-dev.off()
-```
+invisible(dev.off())
 
-    ## pdf 
-    ##   2
+agg_png(paste0(plot_file, ".png"),
+        width = 10, 
+        height = 11, 
+        units = 'cm',
+        res = 900, 
+        scaling = 0.38)
+print(composite_plot)
+invisible(invisible(dev.off()))
 
-``` r
-ggsave(
-  paste0(plot_file, ".png"),
-  composite_plot,
-  device = agg_png,
-  width = 14, 
-  height = 10.5, 
-  units = "cm", 
-  res = 900,
-  scaling = 0.38
-)
 gz(paste0(plot_file, ".svg"), paste0(plot_file, ".svgz"))
 knitr::include_graphics(paste0(plot_file, ".png"))
 ```
 
-<img src="./Results/Microbiome_1.png" width="1587" />
+<img src="./Results/Microbiome_1.png" width="1134" />
 
 ``` r
 plot_file <- "./Results/Microbiome_2"
@@ -8866,39 +5475,32 @@ svglite(paste0(plot_file, ".svg"),
         width = 12, 
         height = 10)
 print(p_corncob_locExroc)
-dev.off()
-```
+invisible(dev.off())
 
-    ## pdf 
-    ##   2
-
-``` r
-ggsave(
-  paste0(plot_file, ".png"),
-  p_corncob_locExroc,
-  device = agg_png,
-  width = 12, 
-  height = 10, 
-  units = "cm", 
-  res = 900,
-  scaling = 0.38
-)
+agg_png(paste0(plot_file, ".png"),
+        width = 12, 
+        height = 10.5, 
+        units = 'cm',
+        res = 900, 
+        scaling = 0.38)
+print(p_corncob_locExroc)
+invisible(invisible(dev.off()))
 gz(paste0(plot_file, ".svg"), paste0(plot_file, ".svgz"))
 ```
 
 ### References
 
-<div id="refs" class="references">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-chen_gmpr:_2017">
+<div id="ref-chen_gmpr:_2017" class="csl-entry">
 
-Chen, Jun, and Li Chen. 2017. “GMPR: A novel normalization method for
-microbiome sequencing data.” *bioRxiv*, February, 112565.
-<https://doi.org/10.1101/112565>.
+Chen, Jun, and Li Chen. 2017. “<span class="nocase">GMPR: A novel
+normalization method for microbiome sequencing data</span>.” *bioRxiv*,
+February, 112565. <https://doi.org/10.1101/112565>.
 
 </div>
 
-<div id="ref-martin_modeling_2020">
+<div id="ref-martin_modeling_2020" class="csl-entry">
 
 Martin, Bryan D., Daniela Witten, and Amy D. Willis. 2020. “Modeling
 Microbial Abundances and Dysbiosis with Beta-Binomial Regression.”

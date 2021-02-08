@@ -57,7 +57,7 @@ knitr::opts_chunk$set(
 )
 f_name <- "DejaVu Sans" #sub("\\s//", "", f_name)
 f_size <- 12
-font_import(pattern = "DejaVuSans", prompt = FALSE)
+font_import(pattern = "DejaVuSans\\.", prompt = FALSE)
 loadfonts() # registers fonts
 theme_set(theme_bw(base_size = f_size, 
                       base_family = f_name
@@ -645,7 +645,7 @@ STAMPR2 <- function(physeq_obj,
     return(Taxa_tests)
   }
 
-plotSTAMPR <- function(STAMPR_output = Taxa_tests_phylum1, pair = "City - Slope", tax_level = "Phylum", f_size = 12){
+plotSTAMPR <- function(STAMPR_output = Taxa_tests_phylum1, pair = "City - Slope", tax_level = "Phylum", f_size = 14){
   require(ggthemes)
   require(ggpomological)
   if (!is.list(STAMPR_output) | length(STAMPR_output) != 2) {print("The function accepts only lists with two elements")}
@@ -760,7 +760,7 @@ plotSTAMPR <- function(STAMPR_output = Taxa_tests_phylum1, pair = "City - Slope"
     coord_flip()
 
   # p1 + p2 + plot_layout(widths = c(1, 2)) # doesn't look as good
-  plot_grid(p1, p2, rel_widths = c(2, 3))
+  plot_grid(p1, p2, rel_widths = c(2, 3)) + theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"))
   # ggthemr_reset()
 }
 
@@ -807,7 +807,7 @@ GGPlotCorncob <- function(da_analysis_df, OTU_labels = FALSE, Taxa = "Phylum", Y
     xlab("") +
     ylab("Differential abundance") +
     labs(colour = paste("Significance at \n p <", sig_level), size = "Mean abundance (%)") +
-    theme_grey(base_size = 18, ) +
+    theme_grey(base_size = 18) +
     theme(axis.text.x = element_text(angle = 45.0, vjust = 1, hjust = 1),
           panel.grid.major.x = element_blank(),
           panel.grid.minor.x = element_blank()) +
@@ -1337,6 +1337,7 @@ p_alpha <- ggplot() +
   ),
   legend.position="none") +
   facet_grid(Metric ~ Rock.type, scale = "free") +
+  theme(strip.text = element_text(size = f_size - 4)) +
   background_grid(major = "y",
                   minor = "none",
                   size.major = 0.8) 
@@ -1514,7 +1515,7 @@ p_ord_phylo <- ggplot(ord_df,
     inherit.aes = FALSE
   ) +
   geom_point2(size = 4, alpha = 2 / 3) +
-  theme_bw(base_size = 14) +
+  # theme_bw(base_size = f_size) +
   guides(colour = guide_legend(title = "Location"), shape = guide_legend(title = "Rock.type")) +
   scale_colour_manual(values = Gradient.colours) +
   scale_fill_manual(values = Gradient.colours, guide = "none") +
@@ -1530,19 +1531,18 @@ STAMPR analysis of the differences of each phylum between locations using Aligne
 ```{r STAMPR, fig.width=12, fig.height=6, cache=T, results="hide"}
 Taxa_tests_phylum1 <- STAMPR2(Ps_obj_filt, vars2test = "Location", threshold = 0.05, outputfile = paste0(Proj_name, "_Location"))
 
-pSTAMPR1 <- plotSTAMPR(Taxa_tests_phylum1, pair = "Slope - City")
+pSTAMPR1 <- plotSTAMPR(Taxa_tests_phylum1, pair = "Slope - City", f_size = f_size)
 print(pSTAMPR1)
 
 Taxa_tests_phylum2 <- STAMPR2(Ps_obj_filt, vars2test = c("Location", "Rock.type"), threshold = 0.05, outputfile = paste0(Proj_name, "_Location_Rock"))
 
-pSTAMPR2 <- plotSTAMPR(Taxa_tests_phylum2, pair = "Slope:Chalk - City:Chalk")
+pSTAMPR2 <- plotSTAMPR(Taxa_tests_phylum2, pair = "Slope:Chalk - City:Chalk", f_size = f_size)
 print(pSTAMPR2)
 ```
 
 ### Taxonmic distribution analysis  
 Agglomerate data and tag rare taxa
 ```{r agglomarate rares, cache=T}
-
 Ps_obj_filt_GMPR %>% 
   transform_sample_counts(., function(x){x / sum(x)} * 100) %>% 
   tax_glom(., 
@@ -1624,8 +1624,7 @@ p_taxa_box <-
     size = 2
   ) +
   scale_colour_manual(values = Gradient.colours, name = "") +
-  theme_bw()+
-  # theme_cowplot(font_size = 11, font_family = f_name) +
+  # theme_bw()+
   labs(x = NULL, y = "Relative abundance (%)") +
   guides(colour = guide_legend(override.aes = list(size = 5))) +
   facet_grid(Location ~ .) +
@@ -1833,25 +1832,28 @@ plot(mod260_Loc, color = "Location", shape = "Rock.type") # add total = TRUE for
 
 ### Compose figures
 ```{r Figures, cache=F}
-composite_plot <- ((p_alpha + p_taxa_box +  plot_layout(widths = c(1, 2))) /(p_ord + pSTAMPR1) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)))
+# composite_plot <- ((p_alpha + p_taxa_box +  plot_layout(widths = c(1, 2))) /(p_ord + pSTAMPR1) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)))
+
+composite_plot <- (p_alpha + p_ord) /(p_taxa_box) / (pSTAMPR1) + 
+  plot_layout(heights = c(1.5, 1, 1)) +
+  plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)) 
 
 plot_file <- "./Results/Microbiome_1"
 svglite(paste0(plot_file, ".svg"), 
-        width = 14, 
-        height = 10.5)
+        width = 10, 
+        height = 11)
 print(composite_plot)
-dev.off()
+invisible(dev.off())
 
-ggsave(
-  paste0(plot_file, ".png"),
-  composite_plot,
-  device = agg_png,
-  width = 14, 
-  height = 10.5, 
-  units = "cm", 
-  res = 900,
-  scaling = 0.38
-)
+agg_png(paste0(plot_file, ".png"),
+        width = 10, 
+        height = 11, 
+        units = 'cm',
+        res = 900, 
+        scaling = 0.38)
+print(composite_plot)
+invisible(invisible(dev.off()))
+
 gz(paste0(plot_file, ".svg"), paste0(plot_file, ".svgz"))
 knitr::include_graphics(paste0(plot_file, ".png"))
 
@@ -1860,18 +1862,16 @@ svglite(paste0(plot_file, ".svg"),
         width = 12, 
         height = 10)
 print(p_corncob_locExroc)
-dev.off()
+invisible(dev.off())
 
-ggsave(
-  paste0(plot_file, ".png"),
-  p_corncob_locExroc,
-  device = agg_png,
-  width = 12, 
-  height = 10, 
-  units = "cm", 
-  res = 900,
-  scaling = 0.38
-)
+agg_png(paste0(plot_file, ".png"),
+        width = 12, 
+        height = 10.5, 
+        units = 'cm',
+        res = 900, 
+        scaling = 0.38)
+print(p_corncob_locExroc)
+invisible(invisible(dev.off()))
 gz(paste0(plot_file, ".svg"), paste0(plot_file, ".svgz"))
 ```
 
