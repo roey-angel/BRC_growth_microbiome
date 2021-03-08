@@ -1,6 +1,6 @@
 How fast does biological rock crust grow?
 ================
-08 February, 2021
+09 March, 2021
 
 -   [Setting general parameters:](#setting-general-parameters)
 -   [Description](#description)
@@ -21,7 +21,7 @@ How fast does biological rock crust grow?
         -   [Calculate and plot alpha diversity
             metrics](#calculate-and-plot-alpha-diversity-metrics)
         -   [Test the differences in alpha
-            diversity.](#test-the-differences-in-alpha-diversity.)
+            diversity.](#test-the-differences-in-alpha-diversity)
         -   [Plot all alpha diversity metrics
             together](#plot-all-alpha-diversity-metrics-together)
     -   [Beta diversity](#beta-diversity)
@@ -5277,7 +5277,7 @@ corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Loc_df$`Differential ab
 
 p_corncob_loc <- p_corncob_loc +
   labs(title = paste(comparison_string, collapse = " - ")) +
-  coord_cartesian(ylim = c(-15, 15))
+  coord_cartesian(ylim = c(-10, 10))
 print(p_corncob_loc)
 ```
 
@@ -5328,7 +5328,7 @@ corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Rock_df$`Differential a
 
 p_corncob_rock <- p_corncob_rock +
   labs(title = paste(comparison_string, collapse = " - ")) +
-  coord_cartesian(ylim = c(-15, 15))
+  coord_cartesian(ylim = c(-10, 10))
 print(p_corncob_rock)
 ```
 
@@ -5380,7 +5380,7 @@ corncob_summary <- tibble(Label = c(paste0("⬆", sum(da_Loc_exRock_df$`Differen
 
 p_corncob_locExroc <- p_corncob_locExroc +
   labs(title = paste(comparison_string, collapse = " - ")) +
-  coord_cartesian(ylim = c(-15, 15))
+  coord_cartesian(ylim = c(-10, 10))
 print(p_corncob_locExroc)
 ```
 
