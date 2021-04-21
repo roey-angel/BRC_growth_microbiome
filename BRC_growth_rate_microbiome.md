@@ -1,6 +1,6 @@
 How fast does biological rock crust grow?
 ================
-09 March, 2021
+20 April, 2021
 
 -   [Setting general parameters:](#setting-general-parameters)
 -   [Description](#description)
@@ -5283,6 +5283,10 @@ print(p_corncob_loc)
 
 ![](BRC_growth_rate_figures/corncob%20-%20location-1.svg)<!-- -->
 
+``` r
+write.csv(da_Loc_df, file = paste0("./Results/corncob_", comparison_string[1], "_vs_", comparison_string[2], ".csv"))
+```
+
 Modelling differential abundance and variance between locations
 discovered `length(da_Loc$significant_taxa)`
 
@@ -5333,6 +5337,10 @@ print(p_corncob_rock)
 ```
 
 ![](BRC_growth_rate_figures/corncob%20-%20rock-1.svg)<!-- -->
+
+``` r
+write.csv(da_Rock_df, file = paste0("./Results/corncob_", comparison_string[1], "_vs_", comparison_string[2], ".csv"))
+```
 
 Modelling differential abundance and variance between rock types
 discovered `length(da_Rock$significant_taxa)`
@@ -5385,6 +5393,10 @@ print(p_corncob_locExroc)
 ```
 
 ![](BRC_growth_rate_figures/corncob%20-%20loc%20exl.%20rock-1.svg)<!-- -->
+
+``` r
+write.csv(da_Loc_exRock_df, file = paste0("./Results/corncob_", comparison_string[1], "_vs_", comparison_string[2], "_ExRockType.csv"))
+```
 
 Modelling differential abundance between locations, while controlling
 for rock type discovered `length(da_Loc_exRock$significant_taxa)`
@@ -5442,7 +5454,6 @@ plot(mod260_Loc, color = "Location", shape = "Rock.type") # add total = TRUE for
 
 ``` r
 # composite_plot <- ((p_alpha + p_taxa_box +  plot_layout(widths = c(1, 2))) /(p_ord + pSTAMPR1) + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)))
-
 composite_plot <- (p_alpha + p_ord) /(p_taxa_box) / (pSTAMPR1) + 
   plot_layout(heights = c(1.5, 1, 1)) +
   plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = f_size)) 
