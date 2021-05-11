@@ -1,7 +1,7 @@
 How fast do biological rock crusts grow?
 ========
 
-[![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.com/RoeyAngel)   ![license](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square)
+[![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.com/RoeyAngel)   ![license](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square)   [![DOI](https://zenodo.org/badge/304836305.svg)](https://zenodo.org/badge/latestdoi/304836305)
 
 
 Data, sequence analysis ploting for the microbiome figures included in the paper: [Nimrod Wieler, Tali Erickson Gini, Roey Angel and Osnat Gillor: Estimating bacterial rock crust growth rate using a well-dated millennia-old arid archaeological site]
